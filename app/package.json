@@ -1,0 +1,19 @@
+{
+  "name": "docker",
+  "scripts": {
+    "dev": "bun run --hot src/index.ts",
+    "prebuild": "bunx prisma generate"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.21.1",
+    "hono": "^4.6.7",
+    "uuid": "^10.0.0"
+  },
+  "prisma": {
+    "seed": "node scripts/seed.js"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "prisma": "^5.21.1"
+  }
+}

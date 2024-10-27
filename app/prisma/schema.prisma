@@ -1,0 +1,23 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  bio       String   @db.Text()
+  createdAt DateTime @default(now())
+}
+
+// model Contact {
+
+// }
+
+// model Chat {
+
+// }
+
+// model Message {
+
+// }

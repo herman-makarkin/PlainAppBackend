@@ -1,0 +1,47 @@
+version: "3"
+
+services:
+  postgres:
+    container_name: postgres_db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_USER=admin
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app_network
+    image: postgres:17-alpine3.20
+
+  bun_app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: bun_app
+    depends_on:
+      - postgres
+    volumes:
+      - ./app:/usr/src/app
+    expose:
+      - "3000"
+    networks:
+      - app_network
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: nginx_server
+    ports:
+      - "80:80"
+    depends_on:
+      - bun_app
+    networks:
+      - app_network
+
+volumes:
+  postgres_data:
+
+networks:
+  app_network:
+    driver: bridge
