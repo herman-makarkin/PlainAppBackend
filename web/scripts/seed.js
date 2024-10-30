@@ -6,22 +6,22 @@ const usersToCreate = [
   {
     id: 1,
     name: "Michael",
-    bio: "im gay",
+    bio: "im happy",
   },
   {
     id: 2,
     name: "Ivan",
-    bio: "im gay",
+    bio: "im happy",
   },
   {
     id: 3,
     name: "Pedro",
-    bio: "im gay",
+    bio: "im happy",
   },
   {
     id: 4,
     name: "Pablo",
-    bio: "im gay",
+    bio: "im happy",
   },
 ];
 

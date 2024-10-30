@@ -5,7 +5,12 @@ ENV BUN_PATH /opt/server/node_modules
 
 WORKDIR /opt/server/
 
-COPY . .
+COPY package*.json ./
 RUN bun i
+
+COPY ./prisma prisma
+COPY ./src src
+RUN apk add openssl1.1-compat
+RUN bunx prisma generate
 
 CMD ["bun", "dev"]

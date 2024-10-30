@@ -1,0 +1,29 @@
+generator client {
+  provider      = "prisma-client-js"
+  output        = "./packages/lib/generated/prisma"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  bio       String   @db.Text()
+  createdAt DateTime @default(now())
+}
+
+// model Contact {
+
+// }
+
+// model Chat {
+
+// }
+
+// model Message {
+
+// }

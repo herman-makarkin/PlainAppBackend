@@ -2,19 +2,17 @@ import { Hono } from "hono";
 import { v4 as uuidv4 } from "uuid";
 import { stream, streamText } from "hono/streaming";
 import { createBunWebSocket } from "hono/bun";
-//import { routes } from "./routes";
+import { routes } from "./routes";
 
 const users: any = [];
 
 const app = new Hono();
 
-//routes(app);
+routes(app);
 
 app.get("/", (c) => {
   return c.text("hello");
 });
-
-app.get("/users", (c) => c.text("List of users"));
 
 app.post("/user", async (c) => {
   const { userName, userBio } = await c.req.json();

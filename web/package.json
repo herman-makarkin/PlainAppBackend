@@ -2,18 +2,22 @@
   "name": "docker",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
-    "prebuild": "bunx prisma generate"
+    "prebuild": "bunx prisma generate",
+    "seed": "bun scripts/seed.js"
   },
   "dependencies": {
-    "@prisma/client": "^5.21.1",
+    "@prisma/client": "5.21.1",
+    "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.36.0",
     "hono": "^4.6.7",
+    "pg": "^8.13.1",
     "uuid": "^10.0.0"
-  },
-  "prisma": {
-    "seed": "node scripts/seed.js"
   },
   "devDependencies": {
     "@types/bun": "latest",
-    "prisma": "^5.21.1"
+    "@types/pg": "^8.11.10",
+    "drizzle-kit": "^0.27.0",
+    "prisma": "5.21.1",
+    "tsx": "^4.19.2"
   }
 }

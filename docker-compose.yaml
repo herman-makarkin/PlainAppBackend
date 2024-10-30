@@ -11,10 +11,11 @@ services:
     env_file:
       - .env
     expose:
-      - '3000'
+      - "3000"
+    ports:
+      - 3000:3000
     depends_on:
       - db
-
     develop:
       watch:
         - action: sync
@@ -23,7 +24,8 @@ services:
 
         - action: rebuild
           path: package.json
-          target: opt/server/web
+          target: /opt/server/web
+
   db:
     image: postgres:17-alpine
     environment:
@@ -32,7 +34,9 @@ services:
     volumes:
       - ./postgres:/var/lib/postgresql/data
     expose:
-      - '5432'
+      - "5432"
+    ports:
+      - 5432:5432
     restart: always
 
   nginx:
@@ -43,7 +47,7 @@ services:
       - pgadmin
     image: nginx:latest
     ports:
-      - '80:80'
+      - "80:80"
     volumes:
       - ./nginx:/etc/nginx/conf.d
       - ./static:/var/www/static
@@ -58,6 +62,5 @@ services:
       PGADMIN_DEFAULT_EMAIL: german.makarkin@gmail.com
       PGADMIN_DEFAULT_PASSWORD: qwerty
     expose:
-      - '80'
+      - "80"
     restart: always
-
