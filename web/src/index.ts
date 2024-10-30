@@ -1,36 +1,40 @@
 import { Hono } from "hono";
 import { v4 as uuidv4 } from "uuid";
 import { stream, streamText } from "hono/streaming";
-import { routes } from "./routes";
+import { createBunWebSocket } from "hono/bun";
+//import { routes } from "./routes";
 
-// const users: any = [];
+const users: any = [];
 
 const app = new Hono();
 
-routes(app);
-// app.get("/", (c) => {
-//   return c.text("Hello Hono!");
-// });
+//routes(app);
 
-// app.post("/user", async (c) => {
-//   const { userName, userBio } = await c.req.json();
-//   const newUser = {
-//     id: uuidv4(),
-//     userName,
-//     userBio,
-//   };
-//   users.push(newUser);
-//   return c.json(newUser);
-// });
+app.get("/", (c) => {
+  return c.text("hello");
+});
 
-// app.get("/users", async (c) => {
-//   return streamText(c, async (stream) => {
-//     for (const user of users) {
-//       await stream.writeln(JSON.stringify(user));
-//       await stream.sleep(1000);
-//     }
-//   });
-// });
+app.get("/users", (c) => c.text("List of users"));
+
+app.post("/user", async (c) => {
+  const { userName, userBio } = await c.req.json();
+  const newUser = {
+    id: uuidv4(),
+    userName,
+    userBio,
+  };
+  users.push(newUser);
+  return c.json(newUser);
+});
+
+//app.get("/users", async (c) => {
+//  return streamText(c, async (stream) => {
+//    for (const user of users) {
+//      await stream.writeln(JSON.stringify(user));
+//      await stream.sleep(1000);
+//    }
+//  });
+//});
 
 // app.get("/user/:id", (c) => {
 //   const { id } = c.req.param();

@@ -1,47 +1,63 @@
-version: "3"
-
 services:
-  postgres:
-    container_name: postgres_db
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_PASSWORD=root
-      - POSTGRES_USER=admin
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - app_network
-    image: postgres:17-alpine3.20
-
-  bun_app:
+  app:
     build:
-      context: ./app
-      dockerfile: Dockerfile
-    container_name: bun_app
-    depends_on:
-      - postgres
+      context: ./web
+      target: dev
+    tty: true
+    working_dir: /opt/server
     volumes:
-      - ./app:/usr/src/app
+      - ./web:/opt/server
+      - ./static:/opt/static
+    env_file:
+      - .env
     expose:
-      - "3000"
-    networks:
-      - app_network
-  nginx:
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
-    container_name: nginx_server
-    ports:
-      - "80:80"
+      - '3000'
     depends_on:
-      - bun_app
-    networks:
-      - app_network
+      - db
 
-volumes:
-  postgres_data:
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /opt/server/web/src
 
-networks:
-  app_network:
-    driver: bridge
+        - action: rebuild
+          path: package.json
+          target: opt/server/web
+  db:
+    image: postgres:17-alpine
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    expose:
+      - '5432'
+    restart: always
+
+  nginx:
+    container_name: nginx
+    depends_on:
+      - app
+      - db
+      - pgadmin
+    image: nginx:latest
+    ports:
+      - '80:80'
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ./static:/var/www/static
+    restart: always
+
+  pgadmin:
+    container_name: pgadmin
+    depends_on:
+      - db
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: german.makarkin@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: qwerty
+    expose:
+      - '80'
+    restart: always
+

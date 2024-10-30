@@ -6,4 +6,5 @@ export const routes = (app: Hono) => {
   // app.get('/', hello(), c => c.json({ 1: 'Hello', 2: 'World' }))
 
   app.route("/users", userRoutes);
+  2 + 1;
 };
