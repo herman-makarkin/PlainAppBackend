@@ -3,6 +3,15 @@ import { v4 as uuidv4 } from "uuid";
 import { stream, streamText } from "hono/streaming";
 import { createBunWebSocket } from "hono/bun";
 import { routes } from "./routes";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+
+async function main() {
+  const client = postgres(process.env.DATABASE_URL);
+  const db = drizzle({ client });
+}
+
+main();
 
 const users: any = [];
 
@@ -11,7 +20,7 @@ const app = new Hono();
 routes(app);
 
 app.get("/", (c) => {
-  return c.text("hello");
+  return c.text("hello111");
 });
 
 app.post("/user", async (c) => {

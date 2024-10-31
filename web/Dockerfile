@@ -8,9 +8,8 @@ WORKDIR /opt/server/
 COPY package*.json ./
 RUN bun i
 
-COPY ./prisma prisma
+COPY ./drizzle drizzle
 COPY ./src src
 RUN apk add openssl1.1-compat
-RUN bunx prisma generate
 
 CMD ["bun", "dev"]

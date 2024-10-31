@@ -6,7 +6,7 @@ import { stream, streamText } from "hono/streaming";
 import { getUsers } from "./handlers";
 const userRoutes = new Hono()
   .get("/", () => getUsers())
-  .post("/5555", () => "this is post");
+  .post("/5555", (c) => c.text("this is post"));
 //.get("/:id", ({ param: { id } }) => getUser(id))
 
 export default userRoutes;
