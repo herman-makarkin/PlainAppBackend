@@ -8,8 +8,10 @@ WORKDIR /opt/server/
 COPY package*.json ./
 RUN bun i
 
-COPY ./drizzle drizzle
 COPY ./src src
-RUN apk add openssl1.1-compat
+COPY ./drizzle.config.ts drizzle.config.ts
+RUN apk add nodejs npm
+RUN npx drizzle-kit generate
+#RUN npx drizzle-kit migrate
 
 CMD ["bun", "dev"]

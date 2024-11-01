@@ -4,14 +4,15 @@ import { eq } from "drizzle-orm";
 import { usersTable } from "../../db/schema";
 import { HTTPException } from "hono/http-exception";
 
-const db = drizzle(process.env.DATABASE_URL!);
+const db = drizzle(process.env.DB_URL!);
 
 export async function getUsers() {
-  try {
-    return await db.select().from(usersTable);
-  } catch (e: unknown) {
-    console.log(`Error retrieving users: ${e}`);
-  }
+  // try {
+  const result = JSON.stringify(await db.select().from(usersTable));
+  return result;
+  // } catch (e: unknown) {
+  //   console.log(`Error retrieving users: ${e}`);
+  // }
 }
 
 // export async function getUser(id: number) {
