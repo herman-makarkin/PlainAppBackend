@@ -1,34 +1,38 @@
-import "dotenv/config";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { eq } from "drizzle-orm";
 import { usersTable } from "../../db/schema";
 import { HTTPException } from "hono/http-exception";
-
-const db = drizzle(process.env.DB_URL!);
+import db from "../../db";
 
 export async function getUsers() {
-  // try {
-  const result = JSON.stringify(await db.select().from(usersTable));
-  return result;
-  // } catch (e: unknown) {
-  //   console.log(`Error retrieving users: ${e}`);
-  // }
+  try {
+    const result = await db.select().from(usersTable);
+    console.log(result);
+    return result;
+  } catch (e: unknown) {
+    console.log(`Error retrieving users: ${e}`);
+    return "suck";
+  }
 }
 
-// export async function getUser(id: number) {
-//   try {
-//     const user = await db.post.findUnique({ where: { id } });
+export async function getUser(id: number) {
+  try {
+    const user = await db
+      .select({
+        id: id,
+      })
+      .from(usersTable);
 
-//     if (!user) {
-//       console.log("User not Found");
-//       throw new HTTPException(401, { message: "User not found" });
-//     }
+    if (!user) {
+      console.log("User not Found");
+      throw new HTTPException(401, { message: "User not found" });
+    }
 
-//     return user;
-//   } catch (e: unknown) {
-//     console.log(`Error retrieving user by id: ${e}`);
-//   }
-// }
+    return user;
+  } catch (e: unknown) {
+    console.log(`Error retrieving user by id: ${e}`);
+  }
+}
 
 // export async function updateUser(
 //   id: number,

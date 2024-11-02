@@ -3,10 +3,18 @@ import { v4 as uuidv4 } from "uuid";
 import { stream, streamText } from "hono/streaming";
 //import { getUsers, getUser, updateUser, deleteUser } from "./handlers";
 
-import { getUsers } from "./handlers";
+import { getUsers, getUser } from "./handlers";
 const userRoutes = new Hono()
-  .get("/1", () => getUsers())
-  .get("/5555", (c) => c.text("this is post"));
+  .get("/", async (c) => {
+    const users = await getUsers();
+    console.log(users);
+
+    return c.json(users);
+  })
+  .get("/:id", async (c) => {
+    const id = c.req.param();
+    await getUser(Number(id));
+  });
 //.get("/:id", ({ param: { id } }) => getUser(id))
 
 export default userRoutes;
