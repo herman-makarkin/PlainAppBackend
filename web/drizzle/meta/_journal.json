@@ -5,36 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1730356442824,
-      "tag": "0000_curved_ares",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1730580685423,
-      "tag": "0001_daily_legion",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1730583361582,
-      "tag": "0002_mushy_power_pack",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1730617777061,
-      "tag": "0003_panoramic_dagger",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1730624191760,
-      "tag": "0004_tiny_songbird",
+      "when": 1730657646290,
+      "tag": "0000_spooky_arachne",
       "breakpoints": true
     }
   ]
