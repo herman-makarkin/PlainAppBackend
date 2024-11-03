@@ -64,18 +64,5 @@ services:
     restart: always
     network_mode: "host"
 
-  # pgadmin:
-  #   container_name: pgadmin
-  #   depends_on:
-  #     - db
-  #   image: dpage/pgadmin4
-  #   environment:
-  #     PGADMIN_DEFAULT_EMAIL: german.makarkin@gmail.com
-  #     PGADMIN_DEFAULT_PASSWORD: 1234
-  #   expose:
-  #     - "87"
-  #   restart: always
-  #   network_mode: "host"
-
 volumes:
   postgres_data:

@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { stream, streamText } from "hono/streaming";
 import { createBunWebSocket } from "hono/bun";
 import { routes } from "./routes";
-import { usersTable } from "./db/schema";
+import usersTable from "./db/schema/users";
 import db from "./db";
 
 const users: any = [];

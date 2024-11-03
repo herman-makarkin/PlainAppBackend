@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import { eq } from "drizzle-orm";
-import { usersTable } from "../../db/schema";
+import usersTable from "../../db/schema/users";
 import { HTTPException } from "hono/http-exception";
 import db from "../../db";
 
