@@ -16,6 +16,7 @@ const user = pgTable("users", {
   bio: text("bio"),
   phoneNumber: varchar({ length: 15 }).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const userRelations = relations(user, ({ many }) => ({
