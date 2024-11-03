@@ -18,10 +18,9 @@ export async function getUsers() {
 export async function getUser(id: number) {
   try {
     const user = await db
-      .select({
-        id: id,
-      })
-      .from(usersTable);
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.id, id));
 
     if (!user) {
       console.log("User not Found");

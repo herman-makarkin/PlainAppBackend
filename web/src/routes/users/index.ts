@@ -12,8 +12,9 @@ const userRoutes = new Hono()
     return c.json(users);
   })
   .get("/:id", async (c) => {
-    const id = c.req.param();
-    await getUser(Number(id));
+    console.log(c.req.param());
+    const { id } = c.req.param();
+    return c.json(await getUser(Number(id)));
   });
 //.get("/:id", ({ param: { id } }) => getUser(id))
 
