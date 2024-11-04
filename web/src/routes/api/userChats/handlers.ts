@@ -1,90 +1,84 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import { eq } from "drizzle-orm";
-import usersTable from "../../../db/schema/users";
+import { eq, sql } from "drizzle-orm";
+import { userChats } from "../../../db/schema/users";
 import { HTTPException } from "hono/http-exception";
 import db from "../../../db";
+import { and } from "drizzle-orm";
 
-export async function getUsers() {
+export async function getUserChats(userId: number) {
   try {
-    const result = await db.select().from(usersTable);
+    const result = await db
+      .select()
+      .from(userChats)
+      .where(eq(userChats.userId, userId));
     console.log(result);
     return result;
   } catch (e: unknown) {
-    console.log(`Error retrieving users: ${e}`);
+    console.log(`Error retrieving user chats: ${e}`);
     return "suck";
   }
 }
 
-export async function getUser(id: number) {
+export async function getChatUsers(chatId: number) {
   try {
-    const user = await db
+    const chatUsers = await db
       .select()
-      .from(usersTable)
-      .where(eq(usersTable.id, id));
+      .from(userChats)
+      .where(eq(userChats.userId, chatId));
 
-    if (!user) {
-      console.log("User not Found");
-      throw new HTTPException(401, { message: "User not found" });
+    if (!chatUsers) {
+      console.log("UserChat not Found");
+      // throw new HTTPException(401, { userChat: "UserChat not found" });
     }
 
-    return user;
+    return chatUsers;
   } catch (e: unknown) {
-    console.log(`Error retrieving user by id: ${e}`);
+    console.log(`Error retrieving userChat by id: ${e}`);
   }
 }
 
-// export async function updateUser(
-//   id: number,
-//   options: { name?: string; bio?: string },
-// ) {
-//   try {
-//     const { name, bio } = options;
+export async function getUserChat(userId: number, chatId: number) {
+  try {
+    // const result = await db.query.userChats.findMany({
+    //   where: eq(userChats.userId, userId),
+    // });
+    const result = await db
+      .select()
+      .from(userChats)
+      .where(and(eq(userChats.userId, userId), eq(userChats.chatId, chatId)));
+    console.log(result);
+    return result;
+  } catch (e: unknown) {
+    console.log(`Error retrieving user chats: ${e}`);
+    return "suck";
+  }
+}
 
-//     return await db.user.update({
-//       where: { id },
-//       data: {
-//         ...(name ? { name } : {}),
-//         ...(bio ? { bio } : {}),
-//       },
-//     });
-//   } catch (e: unknown) {
-//     console.log(`Error updating user: ${e}`);
-//   }
-// }
+export async function createUserChat(options: {
+  userId: number;
+  chatId: number;
+}) {
+  try {
+    const { userId, chatId } = options;
 
-// export async function createUser(options: { name?: string; bio?: string }) {
-//   try {
-//     const { name, bio } = options;
+    return await db.insert(userChats).values({
+      userId,
+      chatId,
+    });
+  } catch (e: unknown) {
+    console.log(`Error creating userChat: ${e}`);
+  }
+}
 
-//     return await db.user.create({
-//       data: { name, bio },
-//     });
-//   } catch (e: unknown) {
-//     console.log(`Error creating user: ${e}`);
-//   }
-// }
-
-// export async function deleteUser(options: { id: number }) {
-//   try {
-//     const { id } = options;
-
-//     return await db.user.delete({ where: { id } });
-//   } catch (e: unknown) {
-//     console.log(`Error deleting user: ${e}`);
-//   }
-// }
-
-// import "dotenv/config";
-// import { drizzle } from "drizzle-orm/postgres-js";
-// import { usersTable } from "../../db/schema";
-// import { HTTPException } from "hono/http-exception";
-
-// const db = drizzle(process.env.DATABASE_URL!);
-
-// export async function getUsers() {
-//   try {
-//     return await db.select().from(usersTable);
-//   } catch (e: unknown) {
-//     console.log(`Error retrieving users: ${e}`);
-//   }
-// }
+export async function deleteUserChat(options: {
+  userId: number;
+  chatId: number;
+}) {
+  try {
+    const { userId, chatId } = options;
+    return await db
+      .delete(userChats)
+      .where(and(eq(userChats.userId, userId), eq(userChats.chatId, chatId)));
+  } catch (e: unknown) {
+    console.log(`Error deleting userChat: ${e}`);
+  }
+}
