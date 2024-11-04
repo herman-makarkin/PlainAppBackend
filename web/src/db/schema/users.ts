@@ -14,7 +14,7 @@ const user = pgTable("users", {
   id: serial("id").primaryKey(),
   name: varchar({ length: 60 }),
   bio: text("bio"),
-  phoneNumber: varchar({ length: 15 }).notNull(),
+  phoneNumber: varchar("phone_number", { length: 15 }).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

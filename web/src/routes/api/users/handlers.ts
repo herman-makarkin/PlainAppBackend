@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import usersTable from "../../../db/schema/users";
 import { HTTPException } from "hono/http-exception";
 import db from "../../../db";
+import { sql } from "drizzle-orm";
 
 export async function getUsers() {
   try {
@@ -33,24 +34,32 @@ export async function getUser(id: number) {
   }
 }
 
-// export async function updateUser(
-//   id: number,
-//   options: { name?: string; bio?: string },
-// ) {
-//   try {
-//     const { name, bio } = options;
+export async function updateUser(
+  id: number,
+  options: { phoneNumber?: string; name?: string; bio?: string },
+) {
+  try {
+    const { phoneNumber, name, bio } = options;
 
-//     return await db.user.update({
-//       where: { id },
-//       data: {
-//         ...(name ? { name } : {}),
-//         ...(bio ? { bio } : {}),
-//       },
-//     });
-//   } catch (e: unknown) {
-//     console.log(`Error updating user: ${e}`);
-//   }
-// }
+    return await db
+      .update(usersTable)
+      .set({
+        ...(name ? { name } : {}),
+        ...(bio ? { bio } : {}),
+        ...(phoneNumber ? { phoneNumber } : {}),
+        updatedAt: sql`NOW()`,
+      })
+      .where(eq(usersTable.id, id))
+      .returning({
+        id: usersTable.id,
+        name: usersTable.name,
+        bio: usersTable.bio,
+        phoneNumber: usersTable.phoneNumber,
+      });
+  } catch (e: unknown) {
+    console.log(`Error updating user: ${e}`);
+  }
+}
 
 export async function createUser(options: {
   phoneNumber: string;
@@ -70,25 +79,11 @@ export async function createUser(options: {
   }
 }
 
-export async function deleteUser(id: number) {
+export async function deleteUser(options: { id: number }) {
   try {
+    const { id } = options;
     return await db.delete(usersTable).where(eq(usersTable.id, id));
   } catch (e: unknown) {
     console.log(`Error deleting user: ${e}`);
   }
 }
-
-// import "dotenv/config";
-// import { drizzle } from "drizzle-orm/postgres-js";
-// import { usersTable } from "../../db/schema";
-// import { HTTPException } from "hono/http-exception";
-
-// const db = drizzle(process.env.DATABASE_URL!);
-
-// export async function getUsers() {
-//   try {
-//     return await db.select().from(usersTable);
-//   } catch (e: unknown) {
-//     console.log(`Error retrieving users: ${e}`);
-//   }
-// }
