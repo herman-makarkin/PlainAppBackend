@@ -1,90 +1,84 @@
 import { drizzle } from "drizzle-orm/postgres-js";
-import { eq } from "drizzle-orm";
-import usersTable from "../../db/schema/users";
+import { eq, sql } from "drizzle-orm";
+import chatsTable from "../../../db/schema/chats";
 import { HTTPException } from "hono/http-exception";
-import db from "../../db";
+import db from "../../../db";
 
-export async function getUsers() {
+export async function getChats() {
   try {
-    const result = await db.select().from(usersTable);
+    const result = await db.select().from(chatsTable);
     console.log(result);
     return result;
   } catch (e: unknown) {
-    console.log(`Error retrieving users: ${e}`);
+    console.log(`Error retrieving chats: ${e}`);
     return "suck";
   }
 }
 
-export async function getUser(id: number) {
+export async function getChat(id: number) {
   try {
-    const user = await db
+    const chat = await db
       .select()
-      .from(usersTable)
-      .where(eq(usersTable.id, id));
+      .from(chatsTable)
+      .where(eq(chatsTable.id, id));
 
-    if (!user) {
-      console.log("User not Found");
-      throw new HTTPException(401, { message: "User not found" });
+    if (!chat) {
+      console.log("Chat not Found");
+      throw new HTTPException(401, { message: "Chat not found" });
     }
 
-    return user;
+    return chat;
   } catch (e: unknown) {
-    console.log(`Error retrieving user by id: ${e}`);
+    console.log(`Error retrieving chat by id: ${e}`);
   }
 }
 
-// export async function updateUser(
-//   id: number,
-//   options: { name?: string; bio?: string },
-// ) {
-//   try {
-//     const { name, bio } = options;
+export async function updateChat(
+  id: number,
+  options: { name?: string; description?: string },
+) {
+  try {
+    const { name, description } = options;
 
-//     return await db.user.update({
-//       where: { id },
-//       data: {
-//         ...(name ? { name } : {}),
-//         ...(bio ? { bio } : {}),
-//       },
-//     });
-//   } catch (e: unknown) {
-//     console.log(`Error updating user: ${e}`);
-//   }
-// }
+    return await db
+      .update(chatsTable)
+      .set({
+        ...(name ? { name } : {}),
+        ...(description ? { description } : {}),
+        updatedAt: sql`NOW()`,
+      })
+      .where(eq(chatsTable.id, id))
+      .returning({
+        id: chatsTable.id,
+        name: chatsTable.name,
+        description: chatsTable.description,
+      });
+  } catch (e: unknown) {
+    console.log(`Error updating chat: ${e}`);
+  }
+}
 
-// export async function createUser(options: { name?: string; bio?: string }) {
-//   try {
-//     const { name, bio } = options;
+export async function createChat(options: {
+  name?: string;
+  description?: string;
+}) {
+  try {
+    const { name, description } = options;
 
-//     return await db.user.create({
-//       data: { name, bio },
-//     });
-//   } catch (e: unknown) {
-//     console.log(`Error creating user: ${e}`);
-//   }
-// }
+    return await db.insert(chatsTable).values({
+      name: name,
+      description: description,
+    });
+  } catch (e: unknown) {
+    console.log(`Error creating chat: ${e}`);
+  }
+}
 
-// export async function deleteUser(options: { id: number }) {
-//   try {
-//     const { id } = options;
-
-//     return await db.user.delete({ where: { id } });
-//   } catch (e: unknown) {
-//     console.log(`Error deleting user: ${e}`);
-//   }
-// }
-
-// import "dotenv/config";
-// import { drizzle } from "drizzle-orm/postgres-js";
-// import { usersTable } from "../../db/schema";
-// import { HTTPException } from "hono/http-exception";
-
-// const db = drizzle(process.env.DATABASE_URL!);
-
-// export async function getUsers() {
-//   try {
-//     return await db.select().from(usersTable);
-//   } catch (e: unknown) {
-//     console.log(`Error retrieving users: ${e}`);
-//   }
-// }
+export async function deleteChat(options: { id: number }) {
+  try {
+    const { id } = options;
+    return await db.delete(chatsTable).where(eq(chatsTable.id, id));
+  } catch (e: unknown) {
+    console.log(`Error deleting chat: ${e}`);
+  }
+}

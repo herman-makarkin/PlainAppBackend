@@ -1,21 +1,37 @@
 import { Hono } from "hono";
 import { v4 as uuidv4 } from "uuid";
 import { stream, streamText } from "hono/streaming";
-//import { getUsers, getUser, updateUser, deleteUser } from "./handlers";
+import {
+  getChats,
+  getChat,
+  updateChat,
+  createChat,
+  deleteChat,
+} from "./handlers";
 
-import { getUsers, getUser } from "./handlers";
-const userRoutes = new Hono()
+const chatRoutes = new Hono()
   .get("/", async (c) => {
-    const users = await getUsers();
-    console.log(users);
+    const chats = await getChats();
+    console.log(chats);
 
-    return c.json(users);
+    return c.json(chats);
   })
   .get("/:id", async (c) => {
     console.log(c.req.param());
     const { id } = c.req.param();
-    return c.json(await getUser(Number(id)));
+    return c.json(await getChat(Number(id)));
+  })
+  .delete("/rm/:id", async (c) => {
+    const { id } = c.req.param();
+    return c.json(await deleteChat({ id: Number(id) }));
+  })
+  .post("/new/:name/:description", async (c) => {
+    const { name, description } = c.req.param();
+    return c.json(await createChat({ name, description }));
+  })
+  .put("/update/:id/:name/:description", async (c) => {
+    const { id, name, description } = c.req.param();
+    return c.json(await updateChat(Number(id), { name, description }));
   });
-//.get("/:id", ({ param: { id } }) => getUser(id))
 
-export default userRoutes;
+export default chatRoutes;
