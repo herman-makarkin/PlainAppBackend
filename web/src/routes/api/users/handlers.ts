@@ -1,9 +1,7 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import { eq } from "drizzle-orm";
-import usersTable from "../../../db/schema/users";
+import { eq, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../../db";
-import { sql } from "drizzle-orm";
+import usersTable from "../../../db/schema/users";
 
 export async function getUsers() {
   try {
@@ -67,13 +65,14 @@ export async function createUser(options: {
   bio?: string;
 }) {
   try {
-    const { name, bio, phoneNumber } = options;
+    const { phoneNumber, name, bio } = options;
 
-    return await db.insert(usersTable).values({
+    await db.insert(usersTable).values({
       name: name,
       bio: bio,
       phoneNumber: phoneNumber,
     });
+    return { message: "success" };
   } catch (e: unknown) {
     console.log(`Error creating user: ${e}`);
   }
@@ -82,7 +81,8 @@ export async function createUser(options: {
 export async function deleteUser(options: { id: number }) {
   try {
     const { id } = options;
-    return await db.delete(usersTable).where(eq(usersTable.id, id));
+    await db.delete(usersTable).where(eq(usersTable.id, id));
+    return { message: "success" };
   } catch (e: unknown) {
     console.log(`Error deleting user: ${e}`);
   }
