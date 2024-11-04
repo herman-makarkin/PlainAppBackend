@@ -14,8 +14,9 @@ import message from "./messages";
 const chat = pgTable("chats", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }),
-  bio: text("bio"),
+  description: text("description"),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const chatRelations = relations(chat, ({ many }) => ({

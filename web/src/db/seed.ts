@@ -3,15 +3,35 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import chatsTable, { chatMessages } from "./schema/chats";
 import messageTable from "./schema/messages";
 import usersTable, { userChats } from "./schema/users";
+// import { eq } from "drizzle-orm";
 
 const db = drizzle(
   `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@127.0.0.1:${process.env.DB_PORT}/${process.env.DB_NAME}`,
 );
 
 async function test() {
-  const message = {
-    body: "hello",
-  };
+  // const rmUsers = await db.select().from(usersTable);
+  // for (const u of rmUsers) {
+  //   db.delete(usersTable).where(eq(usersTable.id, u.id));
+  // }
+  const messages = [
+    {
+      body: "hello",
+      createdBy: 2,
+    },
+    {
+      body: "hello",
+      createdBy: 2,
+    },
+    {
+      body: "hello",
+      createdBy: 2,
+    },
+    {
+      body: "hello",
+      createdBy: 2,
+    },
+  ];
 
   let user1 = {
     name: "Vladimir",
@@ -22,25 +42,37 @@ async function test() {
   let user2 = {
     name: "Pedro",
     bio: "im very happy to be alive",
-    phoneNumber: "88005553535",
+    phoneNumber: "88005553536",
   };
 
-  const chat = {
-    name: "my chat",
-    bio: "my gorgeous chat",
+  let user3 = {
+    name: "Pablo",
+    bio: "im very happy to be alive",
+    phoneNumber: "88005553537",
   };
+
+  const chats = [
+    {
+      name: "my chat",
+      description: "my gorgeous chat",
+    },
+    {
+      name: "another chat",
+      description: "my second chat",
+    },
+  ];
 
   const newUsers = await db
     .insert(usersTable)
-    .values([user1, user2])
+    .values([user1, user2, user3])
     .returning({ userId: usersTable.id });
   const newChat = await db
     .insert(chatsTable)
-    .values(chat)
+    .values(chats)
     .returning({ chatId: chatsTable.id });
   const newMessage = await db
     .insert(messageTable)
-    .values(message)
+    .values(messages)
     .returning({ messageId: messageTable.id });
 
   db.insert(userChats)
@@ -53,14 +85,36 @@ async function test() {
         chatId: newChat[0].chatId,
         userId: newUsers[1].userId,
       },
+      {
+        chatId: newChat[1].chatId,
+        userId: newUsers[1].userId,
+      },
+      {
+        chatId: newChat[1].chatId,
+        userId: newUsers[2].userId,
+      },
     ])
     .execute();
 
   db.insert(chatMessages)
-    .values({
-      chatId: newChat[0].chatId,
-      messageId: newMessage[0].messageId,
-    })
+    .values([
+      {
+        chatId: newChat[0].chatId,
+        messageId: newMessage[0].messageId,
+      },
+      {
+        chatId: newChat[0].chatId,
+        messageId: newMessage[1].messageId,
+      },
+      {
+        chatId: newChat[0].chatId,
+        messageId: newMessage[2].messageId,
+      },
+      {
+        chatId: newChat[0].chatId,
+        messageId: newMessage[3].messageId,
+      },
+    ])
     .execute();
 
   const dbUser = await db.select().from(usersTable);

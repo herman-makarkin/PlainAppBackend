@@ -10,7 +10,7 @@ RUN bun i
 
 COPY ./src src
 COPY ./drizzle.config.ts drizzle.config.ts
-# RUN apk add nodejs npm
+RUN apk add nodejs npm
 # RUN npx drizzle-kit generate
 #RUN npx drizzle-kit migrate
 
