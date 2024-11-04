@@ -2,9 +2,10 @@
   "name": "docker",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
-    "seed": "bun src/db/seed.ts",
-    "db:generate": "bunx drizzle-kit generate",
-    "db:migrate": "bunx drizzle-kit migrate"
+    "db:seed": "bun src/db/seed.ts",
+    "db:generate": "npx drizzle-kit generate",
+    "db:migrate": "npx drizzle-kit migrate",
+    "db:reset": "bun src/db/reset.ts"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
