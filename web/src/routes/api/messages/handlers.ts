@@ -1,90 +1,75 @@
 import { drizzle } from "drizzle-orm/postgres-js";
-import { eq } from "drizzle-orm";
-import usersTable from "../../db/schema/users";
+import { eq, sql } from "drizzle-orm";
+import messagesTable from "../../../db/schema/messages";
 import { HTTPException } from "hono/http-exception";
-import db from "../../db";
+import db from "../../../db";
 
-export async function getUsers() {
+export async function getMessages() {
   try {
-    const result = await db.select().from(usersTable);
+    const result = await db.select().from(messagesTable);
     console.log(result);
     return result;
   } catch (e: unknown) {
-    console.log(`Error retrieving users: ${e}`);
+    console.log(`Error retrieving messages: ${e}`);
     return "suck";
   }
 }
 
-export async function getUser(id: number) {
+export async function getMessage(id: number) {
   try {
-    const user = await db
+    const message = await db
       .select()
-      .from(usersTable)
-      .where(eq(usersTable.id, id));
+      .from(messagesTable)
+      .where(eq(messagesTable.id, id));
 
-    if (!user) {
-      console.log("User not Found");
-      throw new HTTPException(401, { message: "User not found" });
+    if (!message) {
+      console.log("Message not Found");
+      throw new HTTPException(401, { message: "Message not found" });
     }
 
-    return user;
+    return message;
   } catch (e: unknown) {
-    console.log(`Error retrieving user by id: ${e}`);
+    console.log(`Error retrieving message by id: ${e}`);
   }
 }
 
-// export async function updateUser(
-//   id: number,
-//   options: { name?: string; bio?: string },
-// ) {
-//   try {
-//     const { name, bio } = options;
+export async function updateMessage(id: number, options: { body: string }) {
+  try {
+    const { body } = options;
 
-//     return await db.user.update({
-//       where: { id },
-//       data: {
-//         ...(name ? { name } : {}),
-//         ...(bio ? { bio } : {}),
-//       },
-//     });
-//   } catch (e: unknown) {
-//     console.log(`Error updating user: ${e}`);
-//   }
-// }
+    return await db
+      .update(messagesTable)
+      .set({
+        ...(body ? { body } : {}),
+        updatedAt: sql`NOW()`,
+      })
+      .where(eq(messagesTable.id, id))
+      .returning({
+        id: messagesTable.id,
+        body: messagesTable.body,
+      });
+  } catch (e: unknown) {
+    console.log(`Error updating message: ${e}`);
+  }
+}
 
-// export async function createUser(options: { name?: string; bio?: string }) {
-//   try {
-//     const { name, bio } = options;
+export async function createMessage(options: { body: string }) {
+  try {
+    const { body } = options;
 
-//     return await db.user.create({
-//       data: { name, bio },
-//     });
-//   } catch (e: unknown) {
-//     console.log(`Error creating user: ${e}`);
-//   }
-// }
+    return await db.insert(messagesTable).values({
+      body: body,
+    });
+  } catch (e: unknown) {
+    console.log(`Error creating message: ${e}`);
+  }
+}
 
-// export async function deleteUser(options: { id: number }) {
-//   try {
-//     const { id } = options;
-
-//     return await db.user.delete({ where: { id } });
-//   } catch (e: unknown) {
-//     console.log(`Error deleting user: ${e}`);
-//   }
-// }
-
-// import "dotenv/config";
-// import { drizzle } from "drizzle-orm/postgres-js";
-// import { usersTable } from "../../db/schema";
-// import { HTTPException } from "hono/http-exception";
-
-// const db = drizzle(process.env.DATABASE_URL!);
-
-// export async function getUsers() {
-//   try {
-//     return await db.select().from(usersTable);
-//   } catch (e: unknown) {
-//     console.log(`Error retrieving users: ${e}`);
-//   }
-// }
+export async function deleteMessage(options: { id: number }) {
+  try {
+    const { id } = options;
+    return await db.delete(messagesTable).where(eq(messagesTable.id, id));
+  } catch (e: unknown) {
+    console.log(`Error deleting message: ${e}`);
+  }
+}
