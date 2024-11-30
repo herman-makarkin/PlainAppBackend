@@ -1,18 +1,19 @@
 services:
   db:
+    container_name: db
     image: postgres:17-alpine
     environment:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
-    volumes:
-      - ./postgres:/var/lib/postgresql/data
     expose:
       - "5432"
     ports:
       - 5432:${DB_PORT}
     restart: always
-    network_mode: "host"
+
+    volumes:
+      - pgdata:/var/lib/postgresql/data
 
   app:
     build:
@@ -32,14 +33,13 @@ services:
     env_file:
       - ./.env
     expose:
-      - "3000"
+      - 3000
     ports:
-      - "3000:3000"
+      - 3000:3000
     depends_on:
       db:
         condition: service_started
     container_name: "bun"
-    network_mode: "host"
     develop:
       watch:
         - action: sync
@@ -62,7 +62,6 @@ services:
       - ./nginx:/etc/nginx/conf.d
       - ./static:/var/www/static
     restart: always
-    network_mode: "host"
 
 volumes:
-  postgres_data:
+  pgdata:
