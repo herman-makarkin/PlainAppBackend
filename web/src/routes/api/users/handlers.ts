@@ -5,7 +5,7 @@ import usersTable from "../../../db/schema/users";
 import chatsTable, { chatMessages } from "../../../db/schema/chats";
 import { userChats } from "../../../db/schema/users";
 import messagesTable from "../../../db/schema/messages"
-import { and, ne } from "drizzle-orm";
+import { and, ne, max } from "drizzle-orm";
 
 export async function getUsers() {
   try {
@@ -14,6 +14,19 @@ export async function getUsers() {
     return result;
   } catch (e: unknown) {
     console.log(`Error retrieving users: ${e}`);
+    return "suck";
+  }
+}
+
+export async function getUserByPN(phoneNumber: string) {
+  try {
+    console.log(phoneNumber)
+    const result = await db.select().from(usersTable).where(eq(usersTable.phoneNumber, phoneNumber));
+    console.log(await db.select().from(usersTable).where(eq(usersTable.phoneNumber, "88005553535")))
+    console.log(result);
+    return result;
+  } catch (e: unknown) {
+    console.log(`Error retrieving user by phone number${e}`);
     return "suck";
   }
 }
@@ -39,7 +52,7 @@ export async function getChatMessages(id1: number, id2: number) {
     console.log(result);
     return result;
   } catch (e: unknown) {
-    console.log(`Error retrieving users: ${e}`);
+    console.log(`Error retrieving chat messages: ${e}`);
     return "suck";
   }
 }
@@ -61,7 +74,7 @@ export async function getChats(id: number) {
     console.log(result);
     return result;
   } catch (e: unknown) {
-    console.log(`Error retrieving users: ${e}`);
+    console.log(`Error retrieving chats: ${e}`);
     return "suck";
   }
 }
@@ -124,7 +137,8 @@ export async function createUser(options: {
       bio: bio,
       phoneNumber: phoneNumber,
     });
-    return { message: "success" };
+    const id = db.select({ id: max(usersTable.id) }).from(usersTable)
+    return id;
   } catch (e: unknown) {
     console.log(`Error creating user: ${e}`);
   }

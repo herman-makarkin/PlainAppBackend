@@ -6,7 +6,8 @@ import {
   deleteUser,
   createUser,
   updateUser,
-  getChatMessages
+  getChatMessages,
+  getUserByPN
 } from "./handlers";
 
 const userRoutes = new Hono()
@@ -21,6 +22,13 @@ const userRoutes = new Hono()
   .get("/chatsM/:userId1/:userId2", async (c) => {
     const { userId1, userId2 } = c.req.param();
     return c.json(await getChatMessages(Number(userId1), Number(userId2)));
+  })
+  .get("/userByPN/:PN", async (c) => {
+    const { PN } = c.req.param();
+    console.log(PN, 'hello');
+    if (PN)
+      return c.json(await getUserByPN(PN.toString()));
+
   })
   .get("/chats/:id", async (c) => {
     const { id } = c.req.param();
