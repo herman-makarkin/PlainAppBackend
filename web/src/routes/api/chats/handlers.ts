@@ -35,23 +35,16 @@ export async function getChat(id: number) {
 
 export async function updateChat(
   id: number,
-  options: { name?: string; description?: string },
 ) {
   try {
-    const { name, description } = options;
-
     return await db
       .update(chatsTable)
       .set({
-        ...(name ? { name } : {}),
-        ...(description ? { description } : {}),
         updatedAt: sql`NOW()`,
       })
       .where(eq(chatsTable.id, id))
       .returning({
-        id: chatsTable.id,
-        name: chatsTable.name,
-        description: chatsTable.description,
+        id: chatsTable.id
       });
   } catch (e: unknown) {
     console.log(`Error updating chat: ${e}`);
@@ -59,16 +52,16 @@ export async function updateChat(
 }
 
 export async function createChat(options: {
-  name?: string;
-  description?: string;
+  participant1?: number;
+  participant2?: number;
 }) {
   try {
-    const { name, description } = options;
+    const { participant1, participant2 } = options;
 
     return await db.insert(chatsTable).values({
-      name: name,
-      description: description,
-    });
+      participant1,
+      participant2,
+    }).returning({id: chatsTable.id});
   } catch (e: unknown) {
     console.log(`Error creating chat: ${e}`);
   }

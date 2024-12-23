@@ -8,20 +8,19 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { userChats } from "./users";
 import message from "./messages";
+import user, { userGroups } from "./users";
 
 const chat = pgTable("chats", {
   id: serial("id").primaryKey(),
-  name: varchar("name", { length: 255 }),
-  description: text("description"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+  participant1: integer("participant1").references(() => user.id),
+  participant2: integer("participant2").references(() => user.id),
 });
 
-export const chatRelations = relations(chat, ({ many }) => ({
+export const chatRelations = relations(chat, ({ one, many }) => ({
   messages: many(chatMessages),
-  participants: many(userChats),
 }));
 
 export const chatMessages = pgTable(

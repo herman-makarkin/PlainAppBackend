@@ -1,6 +1,4 @@
 import { Hono } from "hono";
-import { v4 as uuidv4 } from "uuid";
-import { stream, streamText } from "hono/streaming";
 import {
   getChats,
   getChat,
@@ -8,6 +6,8 @@ import {
   createChat,
   deleteChat,
 } from "./handlers";
+// import { v4 as uuidv4 } from "uuid";
+// import { stream, streamText } from "hono/streaming";
 
 const chatRoutes = new Hono()
   .get("/", async (c) => {
@@ -25,13 +25,23 @@ const chatRoutes = new Hono()
     const { id } = c.req.param();
     return c.json(await deleteChat({ id: Number(id) }));
   })
-  .post("/new/:name/:description", async (c) => {
-    const { name, description } = c.req.param();
-    return c.json(await createChat({ name, description }));
+  // .post("/new/:name/:description", async (c) => {
+  //   const { name, description } = c.req.param();
+  //   return c.json(await createChat({ name, description }));
+  // })
+  .put("/update/:id", async (c) => {
+    const { id } = c.req.param();
+    return c.json(await updateChat(Number(id)));
   })
-  .put("/update/:id/:name/:description", async (c) => {
-    const { id, name, description } = c.req.param();
-    return c.json(await updateChat(Number(id), { name, description }));
+  .put("/new", async (c) => {
+    const json = await c.req.json();
+    try {
+      const { participant1, participant2 } = json;
+      return c.json(await createChat({ participant1, participant2 }));
+    } catch (error) {
+      console.log(error);
+      return c.json({ error: "Invalid data" });
+    }
   });
 
 export default chatRoutes;
