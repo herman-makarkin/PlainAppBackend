@@ -1,11 +1,11 @@
 {
-  "id": "9e233d75-ea88-4689-9732-a6dc39ada8cb",
+  "id": "e024ea56-8207-4032-aec2-0b5c31a23c28",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.chats": {
-      "name": "chats",
+    "public.calls": {
+      "name": "calls",
       "schema": "",
       "columns": {
         "id": {
@@ -26,6 +26,50 @@
           "primaryKey": false,
           "notNull": false
         },
+        "isEdited": {
+          "name": "isEdited",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "finished_at": {
+          "name": "finished_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.chats": {
+      "name": "chats",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -39,10 +83,49 @@
           "primaryKey": false,
           "notNull": false,
           "default": "now()"
+        },
+        "participant1": {
+          "name": "participant1",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "participant2": {
+          "name": "participant2",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "chats_participant1_users_id_fk": {
+          "name": "chats_participant1_users_id_fk",
+          "tableFrom": "chats",
+          "tableTo": "users",
+          "columnsFrom": [
+            "participant1"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "chats_participant2_users_id_fk": {
+          "name": "chats_participant2_users_id_fk",
+          "tableFrom": "chats",
+          "tableTo": "users",
+          "columnsFrom": [
+            "participant2"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -100,6 +183,111 @@
           "name": "chat_messages_chat_id_message_id_pk",
           "columns": [
             "chat_id",
+            "message_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.groups": {
+      "name": "groups",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.group_messages": {
+      "name": "group_messages",
+      "schema": "",
+      "columns": {
+        "group_id": {
+          "name": "group_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "message_id": {
+          "name": "message_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "group_messages_group_id_groups_id_fk": {
+          "name": "group_messages_group_id_groups_id_fk",
+          "tableFrom": "group_messages",
+          "tableTo": "groups",
+          "columnsFrom": [
+            "group_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "group_messages_message_id_messages_id_fk": {
+          "name": "group_messages_message_id_messages_id_fk",
+          "tableFrom": "group_messages",
+          "tableTo": "messages",
+          "columnsFrom": [
+            "message_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "group_messages_group_id_message_id_pk": {
+          "name": "group_messages_group_id_message_id_pk",
+          "columns": [
+            "group_id",
             "message_id"
           ]
         }
@@ -184,6 +372,12 @@
           "primaryKey": true,
           "notNull": true
         },
+        "nickname": {
+          "name": "nickname",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": false
+        },
         "name": {
           "name": "name",
           "type": "varchar(60)",
@@ -192,7 +386,13 @@
         },
         "bio": {
           "name": "bio",
-          "type": "text",
+          "type": "varchar(80)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "birthday": {
+          "name": "birthday",
+          "type": "date",
           "primaryKey": false,
           "notNull": false
         },
@@ -225,8 +425,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.user_chats": {
-      "name": "user_chats",
+    "public.user_groups": {
+      "name": "user_groups",
       "schema": "",
       "columns": {
         "user_id": {
@@ -235,8 +435,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "chat_id": {
-          "name": "chat_id",
+        "group_id": {
+          "name": "group_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -244,9 +444,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "user_chats_user_id_users_id_fk": {
-          "name": "user_chats_user_id_users_id_fk",
-          "tableFrom": "user_chats",
+        "user_groups_user_id_users_id_fk": {
+          "name": "user_groups_user_id_users_id_fk",
+          "tableFrom": "user_groups",
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
@@ -257,12 +457,12 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "user_chats_chat_id_chats_id_fk": {
-          "name": "user_chats_chat_id_chats_id_fk",
-          "tableFrom": "user_chats",
-          "tableTo": "chats",
+        "user_groups_group_id_groups_id_fk": {
+          "name": "user_groups_group_id_groups_id_fk",
+          "tableFrom": "user_groups",
+          "tableTo": "groups",
           "columnsFrom": [
-            "chat_id"
+            "group_id"
           ],
           "columnsTo": [
             "id"
@@ -272,11 +472,11 @@
         }
       },
       "compositePrimaryKeys": {
-        "user_chats_user_id_chat_id_pk": {
-          "name": "user_chats_user_id_chat_id_pk",
+        "user_groups_user_id_group_id_pk": {
+          "name": "user_groups_user_id_group_id_pk",
           "columns": [
             "user_id",
-            "chat_id"
+            "group_id"
           ]
         }
       },

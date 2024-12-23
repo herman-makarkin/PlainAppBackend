@@ -3,6 +3,7 @@ import { eq, sql } from "drizzle-orm";
 import messagesTable from "../../../db/schema/messages";
 import { HTTPException } from "hono/http-exception";
 import db from "../../../db";
+import chatMessages from "../../../db/schema/chats";
 
 export async function getMessages() {
   try {
@@ -53,13 +54,18 @@ export async function updateMessage(id: number, options: { body: string }) {
   }
 }
 
-export async function createMessage(options: { body: string }) {
+export async function createMessage(id: number, options: { body: string, createdBy: number}) {
   try {
-    const { body } = options;
+    const { body, createdBy } = options;
 
-    return await db.insert(messagesTable).values({
-      body: body,
-    });
+    const message = await db.insert(messagesTable).values({
+      body ,
+      createdBy,
+    }).returning({id: messagesTable.id});
+
+    await db.insert(chatMessages).values({chatId: id, messageId: message.id})
+
+    return message;
   } catch (e: unknown) {
     console.log(`Error creating message: ${e}`);
   }

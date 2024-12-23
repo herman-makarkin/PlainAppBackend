@@ -9,6 +9,7 @@ import {
   getChatMessages,
   getUserByPN
 } from "./handlers";
+import "dotenv/config";
 
 const userRoutes = new Hono()
   .get("/", async (c) => {
@@ -23,7 +24,7 @@ const userRoutes = new Hono()
     const { userId1, userId2 } = c.req.param();
     return c.json(await getChatMessages(Number(userId1), Number(userId2)));
   })
-  .get("/userByPN/:PN", async (c) => {
+  .get("/byPN/:PN", async (c) => {
     const { PN } = c.req.param();
     console.log(PN, 'hello');
     if (PN)
@@ -38,13 +39,25 @@ const userRoutes = new Hono()
     const { id } = c.req.param();
     return c.json(await deleteUser({ id: Number(id) }));
   })
-  .put("/new/:phoneNumber/:name/:bio", async (c) => {
-    const { phoneNumber, name, bio } = c.req.param();
-    return c.json(await createUser({ phoneNumber, name, bio }));
+  .put("/new", async (c) => {
+    const json = await c.req.json();
+    try {
+      const { phoneNumber, name, bio } = json;
+      return c.json(await createUser({ phoneNumber, name, bio }));
+    } catch (error) {
+      console.log(error);
+      return c.json({ error: "Invalid data" });
+    }
   })
-  .put("/update/:id/:phoneNumber/:name/:bio", async (c) => {
-    const { id, phoneNumber, name, bio } = c.req.param();
-    return c.json(await updateUser(Number(id), { phoneNumber, name, bio }));
+  .patch("/update", async (c) => {
+    const json = await c.req.json();
+    try {
+      const { id, phoneNumber, name, bio } = json;
+      return c.json(await updateUser(Number(id), { phoneNumber, name, bio }));
+    } catch (error) {
+      console.log(error);
+      return c.json({ error: "Invalid data" });
+    }
   });
 
 export default userRoutes;

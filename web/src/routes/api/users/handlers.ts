@@ -1,9 +1,9 @@
-import { aliasedTable, eq, sql } from "drizzle-orm";
+import { aliasedTable, eq, or, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../../db";
 import usersTable from "../../../db/schema/users";
 import chatsTable, { chatMessages } from "../../../db/schema/chats";
-import { userChats } from "../../../db/schema/users";
+// import { userChats } from "../../../db/schema/users";
 import messagesTable from "../../../db/schema/messages"
 import { and, ne, max } from "drizzle-orm";
 
@@ -33,7 +33,7 @@ export async function getUserByPN(phoneNumber: string) {
 
 export async function getChatMessages(id1: number, id2: number) {
   try {
-    const user2 = aliasedTable(userChats, 'user2');
+    // const user2 = aliasedTable(chatTable, 'user2');
     const result = await db
       .select({
         'id': messagesTable.id,
@@ -43,10 +43,16 @@ export async function getChatMessages(id1: number, id2: number) {
         'createdAt': messagesTable.createdAt,
         'createdBy': messagesTable.createdBy,
       })
-      .from(userChats)
-      .where(eq(userChats.userId, id1))
-      .innerJoin(user2, and(eq(userChats.chatId, user2.chatId), ne(userChats.userId, user2.userId)))
-      .innerJoin(chatMessages, eq(userChats.chatId, chatMessages.chatId))
+      .from(chatsTable)
+      .where(or(
+        and(
+          eq(chatsTable.participant1, id1),
+          eq(chatsTable.participant2, id2)),
+        and(
+          eq(chatsTable.participant1, id2),
+          eq(chatsTable.participant2, id1))
+      ))
+      .innerJoin(chatMessages, eq(chatsTable.id, chatMessages.chatId))
       .innerJoin(messagesTable, eq(chatMessages.messageId, messagesTable.id))
 
     console.log(result);
@@ -62,14 +68,11 @@ export async function getChats(id: number) {
     const result = await db
       .select({
         'id': chatsTable.id,
-        'name': chatsTable.name,
-        'desc': chatsTable.description,
         'updatedAt': chatsTable.updatedAt,
         'createdAt': chatsTable.createdAt,
       })
-      .from(userChats)
-      .where(eq(userChats.userId, id))
-      .innerJoin(chatsTable, eq(userChats.chatId, chatsTable.id))
+      .from(chatsTable)
+      .where(or(eq(chatsTable.participant1, id), eq(chatsTable.participant2, id)))
 
     console.log(result);
     return result;

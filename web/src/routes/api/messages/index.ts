@@ -25,13 +25,26 @@ const messageRoutes = new Hono()
     const { id } = c.req.param();
     return c.json(await deleteMessage({ id: Number(id) }));
   })
-  .post("/new/:body", async (c) => {
-    const { body } = c.req.param();
-    return c.json(await createMessage({ body }));
+  .put("/new/:id", async (c) => {
+    const json = await c.req.json();
+    try {
+      const { id } = c.req.param()
+      const { body, createdBy } = json;
+      return c.json(await createMessage(Number(id), { body, createdBy: Number(createdBy) }));
+    } catch (error) {
+      console.log(error);
+      return c.json({ error: "Invalid data" });
+    }
   })
-  .put("/update/:id/:body", async (c) => {
-    const { id, body } = c.req.param();
-    return c.json(await updateMessage(Number(id), { body }));
+  .put("/update", async (c) => {
+    const json = await c.req.json();
+    try {
+      const { id, body } = json;
+      return c.json(await updateMessage(Number(id), body));
+    } catch (error) {
+      console.log(error);
+      return c.json({ error: "Invalid data" });
+    }
   });
 
 export default messageRoutes;

@@ -2,7 +2,7 @@ import "dotenv";
 import { drizzle } from "drizzle-orm/node-postgres";
 import chatsTable, { chatMessages } from "./schema/chats";
 import messageTable from "./schema/messages";
-import usersTable, { userChats } from "./schema/users";
+import usersTable from "./schema/users";
 // import { eq } from "drizzle-orm";
 
 const db = drizzle(
@@ -10,10 +10,6 @@ const db = drizzle(
 );
 
 async function test() {
-  // const rmUsers = await db.select().from(usersTable);
-  // for (const u of rmUsers) {
-  //   db.delete(usersTable).where(eq(usersTable.id, u.id));
-  // }
   const messages = [
     {
       body: "hello",
@@ -55,10 +51,14 @@ async function test() {
     {
       name: "my chat",
       description: "my gorgeous chat",
+      participant1: 1,
+      participant2: 2,
     },
     {
       name: "another chat",
       description: "my second chat",
+      participant1: 1,
+      participant2: 3,
     },
   ];
 
@@ -75,26 +75,26 @@ async function test() {
     .values(messages)
     .returning({ messageId: messageTable.id });
 
-  db.insert(userChats)
-    .values([
-      {
-        chatId: newChat[0].chatId,
-        userId: newUsers[0].userId,
-      },
-      {
-        chatId: newChat[0].chatId,
-        userId: newUsers[1].userId,
-      },
-      {
-        chatId: newChat[1].chatId,
-        userId: newUsers[1].userId,
-      },
-      {
-        chatId: newChat[1].chatId,
-        userId: newUsers[2].userId,
-      },
-    ])
-    .execute();
+  // db.insert(userChats)
+  //   .values([
+  //     {
+  //       chatId: newChat[0].chatId,
+  //       userId: newUsers[0].userId,
+  //     },
+  //     {
+  //       chatId: newChat[0].chatId,
+  //       userId: newUsers[1].userId,
+  //     },
+  //     {
+  //       chatId: newChat[1].chatId,
+  //       userId: newUsers[1].userId,
+  //     },
+  //     {
+  //       chatId: newChat[1].chatId,
+  //       userId: newUsers[2].userId,
+  //     },
+  //   ])
+  //   .execute();
 
   db.insert(chatMessages)
     .values([
@@ -118,12 +118,11 @@ async function test() {
     .execute();
 
   const dbUser = await db.select().from(usersTable);
-  const dbUserChats = await db.select().from(userChats);
+  // const dbUserChats = await db.select().from(userChats);
   const dbChat = await db.select().from(chatsTable);
   const dbChatMessages = await db.select().from(chatMessages);
   const dbMessage = await db.select().from(messageTable);
   console.log(dbChat);
-  console.log(dbUserChats);
   console.log(dbUser);
   console.log(dbChatMessages);
   console.log(dbMessage);
