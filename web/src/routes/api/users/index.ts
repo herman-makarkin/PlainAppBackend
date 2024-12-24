@@ -42,8 +42,8 @@ const userRoutes = new Hono()
   .put("/new", async (c) => {
     const json = await c.req.json();
     try {
-      const { phoneNumber, name, bio } = json;
-      return c.json(await createUser({ phoneNumber, name, bio }));
+      const { phoneNumber, name, bio, birthdate } = json;
+      return c.json(await createUser({ phoneNumber, name, bio, birthdate }));
     } catch (error) {
       console.log(error);
       return c.json({ error: "Invalid data" });
@@ -52,8 +52,8 @@ const userRoutes = new Hono()
   .patch("/update", async (c) => {
     const json = await c.req.json();
     try {
-      const { id, phoneNumber, name, bio } = json;
-      return c.json(await updateUser(Number(id), { phoneNumber, name, bio }));
+      const { id, phoneNumber, name, bio, birthdate } = json;
+      return c.json(await updateUser(Number(id), { phoneNumber, name, bio, birthdate }));
     } catch (error) {
       console.log(error);
       return c.json({ error: "Invalid data" });

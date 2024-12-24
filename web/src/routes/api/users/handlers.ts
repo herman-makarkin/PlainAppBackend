@@ -102,16 +102,17 @@ export async function getUser(id: number) {
 
 export async function updateUser(
   id: number,
-  options: { phoneNumber?: string; name?: string; bio?: string },
+  options: { phoneNumber?: string; name?: string; bio?: string, birthdate?: string },
 ) {
   try {
-    const { phoneNumber, name, bio } = options;
+    const { phoneNumber, name, bio, birthdate } = options;
 
     return await db
       .update(usersTable)
       .set({
         ...(name ? { name } : {}),
         ...(bio ? { bio } : {}),
+        ...(birthdate ? { birthdate } : {}),
         ...(phoneNumber ? { phoneNumber } : {}),
         updatedAt: sql`NOW()`,
       })
@@ -121,6 +122,7 @@ export async function updateUser(
         name: usersTable.name,
         bio: usersTable.bio,
         phoneNumber: usersTable.phoneNumber,
+        birthdate: usersTable.birthdate
       });
   } catch (e: unknown) {
     console.log(`Error updating user: ${e}`);
@@ -131,14 +133,18 @@ export async function createUser(options: {
   phoneNumber: string;
   name?: string;
   bio?: string;
+  birthdate?: string;
 }) {
   try {
-    const { phoneNumber, name, bio } = options;
+    const { phoneNumber, name, bio, birthdate } = options;
 
     await db.insert(usersTable).values({
       name: name,
       bio: bio,
       phoneNumber: phoneNumber,
+      birthdate: birthdate,
+      createdAt: sql`NOW()`,
+      updatedAt: sql`NOW()`,
     });
     const id = db.select({ id: max(usersTable.id) }).from(usersTable)
     return id;

@@ -8,7 +8,6 @@ import {
   date,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import chat from "./chats";
 import group from "./groups";
 
 const user = pgTable("users", {
@@ -16,7 +15,7 @@ const user = pgTable("users", {
   nickname: varchar({ length: 60 }),
   name: varchar({ length: 60 }),
   bio: varchar({ length: 80 }),
-  birthday: date("birthday"),
+  birthdate: date("birthdate"),
   phoneNumber: varchar("phone_number", { length: 15 }).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -25,30 +24,6 @@ const user = pgTable("users", {
 export const userRelations = relations(user, ({ many }) => ({
   groups: many(userGroups),
 }));
-
-// export const userChats = pgTable(
-//   "user_chats",
-//   {
-//     userId: integer("user_id")
-//       .notNull()
-//       .references(() => user.id),
-//     chatId: integer("chat_id")
-//       .notNull()
-//       .references(() => chat.id),
-//   },
-//   (t) => ({ pk: primaryKey({ columns: [t.userId, t.chatId] }) }),
-// );
-
-// export const userChatsRelations = relations(userChats, ({ one }) => ({
-//   user: one(user, {
-//     fields: [userChats.userId],
-//     references: [user.id],
-//   }),
-//   chat: one(chat, {
-//     fields: [userChats.chatId],
-//     references: [chat.id],
-//   }),
-// }));
 
 export const userGroups = pgTable(
   "user_groups",
