@@ -15,8 +15,8 @@ const chat = pgTable("chats", {
   id: serial("id").primaryKey(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-  participant1: integer("participant1").references(() => user.id),
-  participant2: integer("participant2").references(() => user.id),
+  participant1: integer("participant1").references(() => user.id).notNull(),
+  participant2: integer("participant2").references(() => user.id).notNull(),
 });
 
 export const chatRelations = relations(chat, ({ one, many }) => ({

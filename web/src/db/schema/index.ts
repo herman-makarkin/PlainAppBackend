@@ -1,7 +1,7 @@
 export {
   default as user,
   userRelations,
-  userGroups, userGroupRelations,
+  userGroups, userGroupsRelations,
 } from "./users";
 export {
   default as group,
@@ -15,5 +15,5 @@ export {
   chatMessages,
   chatMessagesRelations,
 } from "./chats";
-export { default as call, callRelations } from "./calls";
+// export { default as call } from "./calls";
 export { default as message } from "./messages";

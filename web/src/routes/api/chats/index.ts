@@ -29,7 +29,7 @@ const chatRoutes = new Hono()
   //   const { name, description } = c.req.param();
   //   return c.json(await createChat({ name, description }));
   // })
-  .put("/update/:id", async (c) => {
+  .patch("/update/:id", async (c) => {
     const { id } = c.req.param();
     return c.json(await updateChat(Number(id)));
   })
