@@ -3,7 +3,8 @@ import { eq, sql } from "drizzle-orm";
 import messagesTable from "../../../db/schema/messages";
 import { HTTPException } from "hono/http-exception";
 import db from "../../../db";
-import chatMessages from "../../../db/schema/chats";
+import { chatMessages } from "../../../db/schema/chats";
+import { groupMessages } from "../../../db/schema/"
 
 export async function getMessages() {
   try {
@@ -54,7 +55,7 @@ export async function updateMessage(id: number, options: { body: string }) {
   }
 }
 
-export async function createMessage(id: number, options: { body: string, createdBy: number}) {
+export async function createChatMessage(id: number, options: { body: string, createdBy: number}) {
   try {
     const { body, createdBy } = options;
 
@@ -63,7 +64,28 @@ export async function createMessage(id: number, options: { body: string, created
       createdBy,
     }).returning({id: messagesTable.id});
 
+    if (!message.id) throw new Error();
+
     await db.insert(chatMessages).values({chatId: id, messageId: message.id})
+
+    return message;
+  } catch (e: unknown) {
+    console.log(`Error creating message: ${e}`);
+  }
+}
+
+export async function createGroupMessage(groupId:number, options: { body: string, createdBy: number }) {
+  try {
+    const { body, createdBy } = options;
+
+    const message = await db.insert(messagesTable).values({
+      body ,
+      createdBy,
+    }).returning({id: messagesTable.id});
+
+    if (!message.id) throw new Error();
+
+    await db.insert(groupMessages).values({groupId: groupId, messageId: message.id})
 
     return message;
   } catch (e: unknown) {
@@ -74,6 +96,8 @@ export async function createMessage(id: number, options: { body: string, created
 export async function deleteMessage(options: { id: number }) {
   try {
     const { id } = options;
+    db.delete(groupMessages).where(eq(groupMessages.messageId, id))
+    db.delete(chatMessages).where(eq(chatMessages.messageId, id))
     return await db.delete(messagesTable).where(eq(messagesTable.id, id));
   } catch (e: unknown) {
     console.log(`Error deleting message: ${e}`);

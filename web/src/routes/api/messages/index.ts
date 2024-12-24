@@ -5,7 +5,8 @@ import {
   getMessages,
   getMessage,
   updateMessage,
-  createMessage,
+  createChatMessage,
+  createGroupMessage,
   deleteMessage,
 } from "./handlers";
 
@@ -25,21 +26,33 @@ const messageRoutes = new Hono()
     const { id } = c.req.param();
     return c.json(await deleteMessage({ id: Number(id) }));
   })
-  .put("/new/:id", async (c) => {
+  .put("/newChatM/:id", async (c) => {
     const json = await c.req.json();
     try {
       const { id } = c.req.param()
       const { body, createdBy } = json;
-      return c.json(await createMessage(Number(id), { body, createdBy: Number(createdBy) }));
+      return c.json(await createChatMessage(Number(id), { body, createdBy: Number(createdBy) }));
     } catch (error) {
       console.log(error);
       return c.json({ error: "Invalid data" });
     }
   })
-  .put("/update", async (c) => {
+  .put("/newGroupM/:id", async (c) => {
     const json = await c.req.json();
     try {
-      const { id, body } = json;
+      const { id } = c.req.param()
+      const { body, createdBy } = json;
+      return c.json(await createGroupMessage(Number(id), { body, createdBy: Number(createdBy) }));
+    } catch (error) {
+      console.log(error);
+      return c.json({ error: "Invalid data" });
+    }
+  })
+  .patch("/update/:id", async (c) => {
+    const json = await c.req.json();
+    try {
+      const { id } = c.req.param()
+      const { body } = json;
       return c.json(await updateMessage(Number(id), body));
     } catch (error) {
       console.log(error);
