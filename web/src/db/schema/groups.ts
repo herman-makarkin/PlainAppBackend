@@ -6,6 +6,7 @@ import {
   text,
   timestamp,
   varchar,
+  jsonb,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { userGroups } from "./users";
@@ -13,10 +14,11 @@ import message from "./messages";
 
 const group = pgTable("groups", {
   id: serial("id").primaryKey(),
-  name: varchar("name", { length: 255 }),
+  name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+  metadata: jsonb('metadata'),
 });
 
 export const groupRelations = relations(group, ({ many }) => ({

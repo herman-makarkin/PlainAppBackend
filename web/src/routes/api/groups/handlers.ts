@@ -1,36 +1,35 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import { eq, sql } from "drizzle-orm";
-import chatsTable from "../../../db/schema/chats";
+import { eq, sql, and } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import groupsTable from "../../../db/schema/groups"
+import { userGroups } from "../../../db/schema/users"
 import db from "../../../db";
 
 export async function getGroups() {
   try {
-    const result = await db.select().from(chatsTable);
+    const result = await db.select().from(groupsTable);
     console.log(result);
     return result;
   } catch (e: unknown) {
-    console.log(`Error retrieving chats: ${e}`);
+    console.log(`Error retrieving groups: ${e}`);
     return "suck";
   }
 }
 
 export async function getGroup(id: number) {
   try {
-    const chat = await db
+    const group = await db
       .select()
-      .from(chatsTable)
-      .where(eq(chatsTable.id, id));
+      .from(groupsTable)
+      .where(eq(groupsTable.id, id));
 
-    if (!chat) {
+    if (!group) {
       console.log("Group not Found");
       throw new HTTPException(401, { message: "Group not found" });
     }
 
-    return chat;
+    return group;
   } catch (e: unknown) {
-    console.log(`Error retrieving chat by id: ${e}`);
+    console.log(`Error retrieving group by id: ${e}`);
   }
 }
 
@@ -39,43 +38,63 @@ export async function updateGroup(
   options: {
     name?: string,
     description?: string
+    metadata?: string
   },
 ) {
   try {
-    const { description, name } = options;
-
+    const { description, name, metadata } = options;
+    if (!name) {
+      throw new HTTPException();
+    }
     return await db
-      .update(chatsTable)
+      .update(groupsTable)
       .set({
         ...(name ? { name } : {}),
+        ...(metadata ? { metadata } : {}),
         ...(description ? { description } : {}),
         updatedAt: sql`NOW()`,
       })
-      .where(eq(chatsTable.id, id))
+      .where(eq(groupsTable.id, id))
       .returning({
-        id: chatsTable.id
+        id: groupsTable.id
       });
   } catch (e: unknown) {
-    console.log(`Error updating chat: ${e}`);
+    console.log(`Error updating group: ${e}`);
     return {message: 'error'};
   }
 }
 
-export async function createGroup(options: {name: string, description: string}) {
+export async function createGroup(options: {name: string, description: string, metadata: string}) {
   try {
-    const { name, description } = options;
+    const { name, description, metadata } = options;
 
-      return await db.insert(groupsTable).values({name, description}).returning({id: groupsTable.id})
+      return await db.insert(groupsTable).values({name, description, metadata}).returning({id: groupsTable.id})
   } catch (e: unknown) {
-    console.log(`Error creating chat: ${e}`);
+    console.log(`Error creating group: ${e}`);
   }
 }
 
 export async function deleteGroup(options: { id: number }) {
   try {
     const { id } = options;
-    return await db.delete(chatsTable).where(eq(chatsTable.id, id));
+    return await db.delete(groupsTable).where(eq(groupsTable.id, id));
   } catch (e: unknown) {
-    console.log(`Error deleting chat: ${e}`);
+    console.log(`Error deleting group: ${e}`);
+  }
+}
+
+export async function addUser(userId: number, groupId: number) {
+  try {
+    return await db.insert(userGroups).values({groupId, userId})
+  } catch (e: unknown) {
+    console.log(`Error adding user to group: ${e}`);
+  }
+}
+
+export async function removeUser(userId: number, groupId: number) {
+  try {
+    return await db.delete(userGroups).where(and(eq(userGroups.userId, userId), eq(userGroups.groupId, groupId)));
+  } catch (e: unknown) {
+    console.log(`Error adding user to group: ${e}`);
   }
 }
