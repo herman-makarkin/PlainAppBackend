@@ -10,6 +10,7 @@ import {
   getUserByPN
 } from "./handlers";
 import "dotenv/config";
+import clients from '../index'
 
 const userRoutes = new Hono()
   .get("/", async (c) => {
@@ -59,5 +60,13 @@ const userRoutes = new Hono()
       return c.json({ error: "Invalid data" });
     }
   });
+
+// export const userEvents = (s) = {
+//   s.on('signin', (id: number) => {
+//     console.log('User signedin:', id);
+//     clients[id] = s;
+//     console.log(s);
+//   });
+// }
 
 export default userRoutes;

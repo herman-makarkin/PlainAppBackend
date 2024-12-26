@@ -5,6 +5,7 @@ import { HTTPException } from "hono/http-exception";
 import db from "../../../db";
 import { chatMessages } from "../../../db/schema/chats";
 import { groupMessages } from "../../../db/schema/"
+import chatsTable from "../../../db/schema/chats"
 
 export async function getMessages() {
   try {
@@ -62,15 +63,35 @@ export async function createChatMessage(id: number, options: { body: string, cre
     const message = await db.insert(messagesTable).values({
       body ,
       createdBy,
-    }).returning({id: messagesTable.id});
+    }).returning();
 
-    if (!message.id) throw new Error();
+    console.log(message, "message~~~~~~~~~~!!!!!!!GAY");
+    if (!message[0].id) throw new Error();
 
-    await db.insert(chatMessages).values({chatId: id, messageId: message.id})
+    await db.insert(chatMessages).values({chatId: id, messageId: message[0].id})
 
-    return message;
+    return message[0];
   } catch (e: unknown) {
     console.log(`Error creating message: ${e}`);
+  }
+}
+
+export async function chatInterlocutor(chatId: number, participantId: number) {
+  try {
+    const chat = await db.select({participant1: chatsTable.participant1, participant2: chatsTable.participant2})
+      .from(chatsTable).where(eq(chatsTable.id, chatId))
+
+    let interlocutor;
+    if (chat[0].participant1 === participantId) interlocutor = chat[0].participant2;
+    else if (chat[0].participant2 === participantId) interlocutor = chat[0].participant1;
+
+    console.log('**', chat);
+    console.log('!!!!!!!!!!!!!!', interlocutor);
+
+    return interlocutor;
+
+  } catch (e: unknown) {
+    console.log(`Error finding the interlocutor: ${e}`);
   }
 }
 

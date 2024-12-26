@@ -1,65 +1,9 @@
 {
-  "id": "e024ea56-8207-4032-aec2-0b5c31a23c28",
+  "id": "6d6bc3a8-409e-434a-8b04-b907c965d06c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.calls": {
-      "name": "calls",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "isEdited": {
-          "name": "isEdited",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        },
-        "finished_at": {
-          "name": "finished_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_by": {
-          "name": "created_by",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.chats": {
       "name": "chats",
       "schema": "",
@@ -88,13 +32,13 @@
           "name": "participant1",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "participant2": {
           "name": "participant2",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "indexes": {},
@@ -206,7 +150,7 @@
           "name": "name",
           "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "description": {
           "name": "description",
@@ -227,6 +171,12 @@
           "primaryKey": false,
           "notNull": false,
           "default": "now()"
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
@@ -313,6 +263,13 @@
           "primaryKey": false,
           "notNull": true
         },
+        "times": {
+          "name": "times",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
         "notify_date": {
           "name": "notify_date",
           "type": "timestamp",
@@ -390,8 +347,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "birthday": {
-          "name": "birthday",
+        "birthdate": {
+          "name": "birthdate",
           "type": "date",
           "primaryKey": false,
           "notNull": false
