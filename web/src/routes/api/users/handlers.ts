@@ -138,16 +138,16 @@ export async function createUser(options: {
   try {
     const { phoneNumber, name, bio, birthdate } = options;
 
-    await db.insert(usersTable).values({
+    const user = await db.insert(usersTable).values({
       name: name,
       bio: bio,
       phoneNumber: phoneNumber,
       birthdate: birthdate,
       createdAt: sql`NOW()`,
       updatedAt: sql`NOW()`,
-    });
-    const id = db.select({ id: max(usersTable.id) }).from(usersTable)
-    return id;
+    }).returning();
+    // const id = db.select({ id: max(usersTable.id) }).from(usersTable)
+    return user;
   } catch (e: unknown) {
     console.log(`Error creating user: ${e}`);
   }

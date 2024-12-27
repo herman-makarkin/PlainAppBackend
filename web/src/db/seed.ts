@@ -49,14 +49,10 @@ async function test() {
 
   const chats = [
     {
-      name: "my chat",
-      description: "my gorgeous chat",
       participant1: 1,
       participant2: 2,
     },
     {
-      name: "another chat",
-      description: "my second chat",
       participant1: 1,
       participant2: 3,
     },

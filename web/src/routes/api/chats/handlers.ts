@@ -52,8 +52,8 @@ export async function updateChat(
 }
 
 export async function createChat(options: {
-  participant1?: number;
-  participant2?: number;
+  participant1: number;
+  participant2: number;
 }) {
   try {
     const { participant1, participant2 } = options;
@@ -61,7 +61,7 @@ export async function createChat(options: {
     return await db.insert(chatsTable).values({
       participant1,
       participant2,
-    }).returning({id: chatsTable.id});
+    }).returning();
   } catch (e: unknown) {
     console.log(`Error creating chat: ${e}`);
   }
