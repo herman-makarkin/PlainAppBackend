@@ -1,10 +1,12 @@
 import { drizzle } from "drizzle-orm/postgres-js";
-import { eq, sql } from "drizzle-orm";
+import { eq, sql, and, isNull} from "drizzle-orm";
 import chatsTable from "../../../db/schema/chats";
 import { HTTPException } from "hono/http-exception";
+import { chatMessages } from "../../../db/schema/chats"
 import db from "../../../db";
+import messagesTable from "../../../db/schema/messages"
 
-export async function getChats() {
+export async function getAllChats() {
   try {
     const result = await db.select().from(chatsTable);
     console.log(result);
@@ -43,9 +45,7 @@ export async function updateChat(
         updatedAt: sql`NOW()`,
       })
       .where(eq(chatsTable.id, id))
-      .returning({
-        id: chatsTable.id
-      });
+      .returning();
   } catch (e: unknown) {
     console.log(`Error updating chat: ${e}`);
   }

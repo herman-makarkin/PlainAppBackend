@@ -7,7 +7,7 @@ import chatMessagesRoutes from "./chatMessages";
 import groupRoutes from "./groups";
 import { test } from "./test";
 import { getChats, getUsers, getUserByPN, updateUser, createUser, getUser  } from './users/handlers'
-import { getChat, createChat } from './chats/handlers'
+import { getChat, createChat, getAllChats } from './chats/handlers'
 
 
 import {createChatMessage, chatInterlocutor} from './messages/handlers'
@@ -47,8 +47,7 @@ export const onConnection = (socket) => {
         console.log(socket.userId);
         clients[Number(id)] = socket;
     });
-
-    socket.on('createUser', async (user) => {
+socket.on('createUser', async (user) => {
         let User = await createUser(user);
         console.log(User);
         if (!User) {
@@ -68,6 +67,7 @@ export const onConnection = (socket) => {
 
     socket.on('userByPN', async (PN: string) => {
         let user = await getUserByPN(PN);
+        console.log('phone number !!#@$%@#', PN);
         if (!user) {
             socket.emit('error', "User not found");
             return;
@@ -92,14 +92,28 @@ export const onConnection = (socket) => {
 
     // Messages
 
-    socket.on('chatMessage', async (msg: Message) => {
+    socket.on('chatMessage', async (chatId: number, msg: Message) => {
         console.log(msg);
-        const message = await createChatMessage(msg.chatId, {body: msg.body, createdBy: msg.createdBy});
-        const interlocutor: number = await chatInterlocutor(msg.chatId, msg.createdBy);
+        console.log("socket!!!", socket.userId);
+        if(!socket.userId) {
+                socket.on('error', "Not singed in");
+                return;
+        }
+        console.log(socket.userId);
+        const message = await createChatMessage(chatId.toString(), {body: msg.body, createdBy: socket.userId});
+        const interlocutor: number = await chatInterlocutor(chatId, socket.userId);
         console.log("message", JSON.stringify(message));
-        if (!clients[interlocutor]) throw new Error('Gay');
-        clients[interlocutor].emit('chatMessage', message);
+        if (!clients[interlocutor]) {
+                socket.emit('error', 'No such interlocutor');
+                return;
+        }
+        clients[interlocutor].emit('chatMessage', chatId, message);
+        socket.emit('chatMessageId', `${message.id}`);
     });
+
+    socket.on('allChats', async () => {
+            socket.emit('allChats', await getAllChats());
+    })
 
     // Chats
     socket.on('myChats', async () => {
@@ -115,12 +129,15 @@ export const onConnection = (socket) => {
     })
 
     socket.on('getUsers', async  (idList: number[]) => {
-        idList.map(async (el: number) => {
-            let user = await getUser(el);
-            if (!user) undefined;
-            else user[0];
-        });
-        socket.emit('getUsers', idList);
+        console.log(idList);
+        let users = new Array(idList.length);
+        for (let i = 0; i < idList.length; i++) {
+            const user = await getUser(idList[i]);
+            if (!user) users[i] = undefined;
+            else users[i] = user[0];
+        }
+        console.log(users);
+        socket.emit('getUsers', users);
     })
 
     socket.on('createChat', async (participant1: number,) => {

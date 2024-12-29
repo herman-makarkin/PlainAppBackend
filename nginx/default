@@ -38,7 +38,7 @@ server {
         # Add index.php to the list if you are using PHP
         index index.html index.htm index.nginx-debian.html;
 
-        server_name restapi4whatsappclone.online;
+        server_name plainapp.ru;
 
         location / {
                 # First attempt to serve request as file, then

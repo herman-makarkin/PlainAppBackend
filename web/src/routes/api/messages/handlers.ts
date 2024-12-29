@@ -82,8 +82,8 @@ export async function chatInterlocutor(chatId: number, participantId: number) {
       .from(chatsTable).where(eq(chatsTable.id, chatId))
 
     let interlocutor;
-    if (chat[0].participant1 === participantId) interlocutor = chat[0].participant2;
-    else if (chat[0].participant2 === participantId) interlocutor = chat[0].participant1;
+    if (chat[0].participant1 == participantId) interlocutor = chat[0].participant2;
+    else if (chat[0].participant2 == participantId) interlocutor = chat[0].participant1;
 
     console.log('**', chat);
     console.log('!!!!!!!!!!!!!!', interlocutor);
