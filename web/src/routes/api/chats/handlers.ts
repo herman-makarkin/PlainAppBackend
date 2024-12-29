@@ -1,5 +1,5 @@
 import { drizzle } from "drizzle-orm/postgres-js";
-import { eq, sql, and, isNull} from "drizzle-orm";
+import { eq, sql, and, ne, isNull} from "drizzle-orm";
 import chatsTable from "../../../db/schema/chats";
 import { HTTPException } from "hono/http-exception";
 import { chatMessages } from "../../../db/schema/chats"
@@ -73,5 +73,28 @@ export async function deleteChat(options: { id: number }) {
     return await db.delete(chatsTable).where(eq(chatsTable.id, id));
   } catch (e: unknown) {
     console.log(`Error deleting chat: ${e}`);
+  }
+}
+
+export async function getNewChatMessages(chatId: number, userId: number) {
+  try {
+    const chat = await db
+      .select()
+      .from(chatMessages)
+      .where(eq(chatMessages.chatId, chatId))
+      .innerJoin(messagesTable, eq(chatMessages.messageId, messagesTable.id))
+      .groupBy(chatMessages.chatId, chatMessages.messageId, messagesTable.id, messagesTable.notifyDate)
+      .having(and(ne(messagesTable.createdBy, userId), isNull(messagesTable.notifyDate)))
+
+    console.log(chat);
+
+    if (!chat) {
+      console.log("Chat not Found");
+      throw new HTTPException(401, { message: "Chat not found" });
+    }
+
+    return chat;
+  } catch (e: unknown) {
+    console.log(`Error retrieving chat by id: ${e}`);
   }
 }

@@ -7,7 +7,7 @@ import chatMessagesRoutes from "./chatMessages";
 import groupRoutes from "./groups";
 import { test } from "./test";
 import { getChats, getUsers, getUserByPN, updateUser, createUser, getUser  } from './users/handlers'
-import { getChat, createChat, getAllChats } from './chats/handlers'
+import { getChat, createChat, getAllChats, getNewChatMessages } from './chats/handlers'
 
 
 import {createChatMessage, chatInterlocutor} from './messages/handlers'
@@ -96,7 +96,7 @@ socket.on('createUser', async (user) => {
         console.log(msg);
         console.log("socket!!!", socket.userId);
         if(!socket.userId) {
-                socket.on('error', "Not singed in");
+                socket.emmit('error', "Not singed in");
                 return;
         }
         console.log(socket.userId);
@@ -111,8 +111,27 @@ socket.on('createUser', async (user) => {
         socket.emit('chatMessageId', `${message.id}`);
     });
 
+    socket.on('newChatMessages', async (chatIds: number[]) => {
+        // const chatIds = options.chatIds;
+        console.log(chatIds, 'chatIds');
+        console.log("socket!!!", socket.userId);
+        if(!socket.userId) {
+                socket.emit('error', "Not singed in");
+                return;
+        }
+
+        const result = new Array(chatIds.length);
+
+        for (let i = 0; i < chatIds.length; i++) {
+            const messages = await getNewChatMessages(chatIds[i], socket.userId);
+            console.log("result", JSON.stringify(messages), 'i', i);
+            result[i] = messages;
+        }
+
+        socket.emit('newChatMessages', result);
+    });
     socket.on('allChats', async () => {
-            socket.emit('allChats', await getAllChats());
+        socket.emit('allChats', await getAllChats());
     })
 
     // Chats

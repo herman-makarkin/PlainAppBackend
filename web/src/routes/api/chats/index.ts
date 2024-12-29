@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import {
-  getChats,
+  getAllChats,
   getChat,
   updateChat,
   createChat,
@@ -11,7 +11,7 @@ import {
 
 const chatRoutes = new Hono()
   .get("/", async (c) => {
-    const chats = await getChats();
+    const chats = await getAllChats();
     console.log(chats);
 
     return c.json(chats);
