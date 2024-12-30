@@ -1,5 +1,5 @@
 import { drizzle } from "drizzle-orm/postgres-js";
-import { eq, sql, and, ne, isNull} from "drizzle-orm";
+import { eq, sql, and, ne, isNull, or} from "drizzle-orm";
 import chatsTable from "../../../db/schema/chats";
 import { HTTPException } from "hono/http-exception";
 import { chatMessages } from "../../../db/schema/chats"
@@ -79,11 +79,18 @@ export async function deleteChat(options: { id: number }) {
 export async function getNewChatMessages(chatId: number, userId: number) {
   try {
     const chat = await db
-      .select()
-      .from(chatMessages)
-      .where(eq(chatMessages.chatId, chatId))
-      .innerJoin(messagesTable, eq(chatMessages.messageId, messagesTable.id))
-      .groupBy(chatMessages.chatId, chatMessages.messageId, messagesTable.id, messagesTable.notifyDate)
+      .select({id: messagesTable.id,
+               body: messagesTable.body,
+               timesResent: messagesTable.timesResent,
+               createdAt: messagesTable.createdAt,
+               updatedAt: messagesTable.updatedAt })
+      .from(chatsTable)
+      .where(and(eq(chatsTable.id, chatId), or(
+          eq(chatsTable.participant1, userId),
+        eq(chatsTable.participant2, userId))))
+      .rightJoin(chatMessages, eq(chatsTable.id, chatMessages.chatId))
+      .rightJoin(messagesTable, eq(chatMessages.messageId, messagesTable.id))
+      .groupBy(chatsTable.id, chatMessages.chatId, chatMessages.messageId, messagesTable.id, messagesTable.notifyDate)
       .having(and(ne(messagesTable.createdBy, userId), isNull(messagesTable.notifyDate)))
 
     console.log(chat);
