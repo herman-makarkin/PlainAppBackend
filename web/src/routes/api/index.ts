@@ -47,6 +47,7 @@ export const onConnection = (socket) => {
     socket.userId = id;
     console.log(socket.userId);
     clients[Number(id)] = socket;
+    socket.emit('signin', 'OK');
   });
   socket.on('createUser', async (user) => {
     let User = await createUser(user);
