@@ -123,12 +123,17 @@ export const onConnection = (socket) => {
     const message = await createChatMessage(chatId.toString(), { body: msg.body, createdBy: socket.userId });
     const interlocutor: number = await chatInterlocutor(chatId, socket.userId);
     console.log("message", JSON.stringify(message));
+    if (message) {
+      socket.emit('chatMessageId', `${message.id}`);
+    } else {
+      socket.emit('error', 'Invalid Data');
+      return;
+    }
     if (!clients[interlocutor]) {
       socket.emit('error', 'No such interlocutor');
       return;
     }
     clients[interlocutor].emit('chatMessage', chatId, message);
-    socket.emit('chatMessageId', `${message.id}`);
   });
 
   socket.on('newChatMessages', async (chatIds: number[]) => {
