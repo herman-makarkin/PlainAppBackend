@@ -3,13 +3,25 @@ import { chatMessages } from "../../../db/schema/chats";
 import { HTTPException } from "hono/http-exception";
 import db from "../../../db";
 import { and } from "drizzle-orm";
+import chatsTable from '../../../db/schema/chats';
+import messagesTable from '../../../db/schema/messages';
 
 export async function getChatMessages(chatId: number) {
   try {
     const result = await db
-      .select()
-      .from(chatMessages)
-      .where(eq(chatMessages.chatId, chatId));
+      .select({
+        id: messagesTable.id,
+        body: messagesTable.body,
+        notifyDate: messagesTable.notifyDate,
+        createdAt: messagesTable.createdAt,
+        createdBy: messagesTable.createdBy,
+        updatedAt: messagesTable.updatedAt,
+        timesResent: messagesTable.timesResent,
+      })
+      .from(chatsTable)
+      .where(eq(chatsTable.id, chatId))
+      .innerJoin(chatMessages, eq(chatsTable.id, chatMessages.chatId))
+      .innerJoin(messagesTable, eq(chatMessages.messageId, messagesTable.id))
     console.log(result);
     return result;
   } catch (e: unknown) {

@@ -93,14 +93,21 @@ export const onConnection = (socket) => {
 
   // Messages
 
-  socket.on('getChatMessages', async (chatId: number) => {
+  socket.on('getChatMessages', async (chatIds: number[]) => {
     if (!socket.userId) {
       socket.emit('error', "Not singed in");
       return;
     }
-    console.log("socket!!!", socket.userId);
-    const messages = await getChatMessages(chatId);
-    socket.emit('getChatMessages', messages);
+
+    const result = new Array(chatIds.length);
+
+    for (let i = 0; i < chatIds.length; i++) {
+      const messages = await getChatMessages(chatIds[i]);
+      console.log("result", JSON.stringify(messages), 'i', i);
+      result[i] = messages;
+    }
+
+    socket.emit('getChatMessages', result);
   });
 
 
