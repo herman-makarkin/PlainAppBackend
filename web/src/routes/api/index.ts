@@ -11,6 +11,7 @@ import { getChat, createChat, getAllChats, getNewChatMessages, markAsRead } from
 
 
 import { createChatMessage, chatInterlocutor } from './messages/handlers'
+import { getChatMessages } from "./chatMessages/handlers";
 
 export const apiRoutes = new Hono();
 apiRoutes.get("/", (c) => c.text("welcome to my api"));
@@ -91,6 +92,17 @@ export const onConnection = (socket) => {
   // });
 
   // Messages
+
+  socket.on('getChatMessages', async (chatId: number) => {
+    if (!socket.userId) {
+      socket.emit('error', "Not singed in");
+      return;
+    }
+    console.log("socket!!!", socket.userId);
+    const messages = await getChatMessages(chatId);
+    socket.emit('getChatMessages', messages);
+  });
+
 
   socket.on('chatMessage', async (chatId: number, msg: Message) => {
     console.log(msg);
