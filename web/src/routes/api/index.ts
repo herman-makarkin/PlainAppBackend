@@ -7,7 +7,7 @@ import chatMessagesRoutes from "./chatMessages";
 import groupRoutes from "./groups";
 import { test } from "./test";
 import { getChats, getUsers, getUserByPN, updateUser, createUser, getUser } from './users/handlers'
-import { getChat, createChat, getAllChats, getNewChatMessages } from './chats/handlers'
+import { getChat, createChat, getAllChats, getNewChatMessages, markAsRead } from './chats/handlers'
 
 
 import { createChatMessage, chatInterlocutor } from './messages/handlers'
@@ -96,7 +96,7 @@ export const onConnection = (socket) => {
     console.log(msg);
     console.log("socket!!!", socket.userId);
     if (!socket.userId) {
-      socket.emmit('error', "Not singed in");
+      socket.emit('error', "Not singed in");
       return;
     }
     console.log(socket.userId);
@@ -130,6 +130,22 @@ export const onConnection = (socket) => {
 
     socket.emit('newChatMessages', result);
   });
+
+  socket.on('markAsRead', async (chatId: number) => {
+    if (!socket.userId) {
+      socket.emit('error', "Not singed in");
+      return;
+    }
+
+
+    const result = await markAsRead(chatId, socket.userId);
+    if (result) {
+      socket.emit('markAsRead', result);
+    } else {
+      socket.emit('error', 'Unknown Error')
+    }
+  })
+
   socket.on('allChats', async () => {
     socket.emit('allChats', await getAllChats());
   })

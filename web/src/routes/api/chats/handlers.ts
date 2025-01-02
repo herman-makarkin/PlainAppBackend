@@ -1,5 +1,5 @@
 import { drizzle } from "drizzle-orm/postgres-js";
-import { eq, sql, and, ne, isNull, or} from "drizzle-orm";
+import { eq, sql, and, ne, isNull, or } from "drizzle-orm";
 import chatsTable from "../../../db/schema/chats";
 import { HTTPException } from "hono/http-exception";
 import { chatMessages } from "../../../db/schema/chats"
@@ -34,6 +34,7 @@ export async function getChat(id: number) {
     console.log(`Error retrieving chat by id: ${e}`);
   }
 }
+
 
 export async function updateChat(
   id: number,
@@ -79,14 +80,16 @@ export async function deleteChat(options: { id: number }) {
 export async function getNewChatMessages(chatId: number, userId: number) {
   try {
     const chat = await db
-      .select({id: messagesTable.id,
-               body: messagesTable.body,
-               timesResent: messagesTable.timesResent,
-               createdAt: messagesTable.createdAt,
-               updatedAt: messagesTable.updatedAt })
+      .select({
+        id: messagesTable.id,
+        body: messagesTable.body,
+        timesResent: messagesTable.timesResent,
+        createdAt: messagesTable.createdAt,
+        updatedAt: messagesTable.updatedAt
+      })
       .from(chatsTable)
       .where(and(eq(chatsTable.id, chatId), or(
-          eq(chatsTable.participant1, userId),
+        eq(chatsTable.participant1, userId),
         eq(chatsTable.participant2, userId))))
       .rightJoin(chatMessages, eq(chatsTable.id, chatMessages.chatId))
       .rightJoin(messagesTable, eq(chatMessages.messageId, messagesTable.id))
@@ -105,3 +108,19 @@ export async function getNewChatMessages(chatId: number, userId: number) {
     console.log(`Error retrieving chat by id: ${e}`);
   }
 }
+
+export async function markAsRead(
+  chatId: number,
+  userId: number
+) {
+  try {
+    await db.execute(sql`UPDATE messages SET notify_date=NOW() FROM chats
+                      JOIN chat_messages ON chat_messages.chat_id = chats.id 
+                      WHERE messages.id = chat_messages.message_id`);
+    return 0;
+  } catch (e: unknown) {
+    console.log(`Error updating chat: ${e}`);
+    return 1;
+  }
+}
+
