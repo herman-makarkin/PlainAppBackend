@@ -66,11 +66,7 @@ export async function getChatMessages(id1: number, id2: number) {
 export async function getChats(id: number) {
   try {
     const result = await db
-      .select({
-        'id': chatsTable.id,
-        'updatedAt': chatsTable.updatedAt,
-        'createdAt': chatsTable.createdAt,
-      })
+      .select()
       .from(chatsTable)
       .where(or(eq(chatsTable.participant1, id), eq(chatsTable.participant2, id)))
 
