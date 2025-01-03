@@ -88,6 +88,17 @@ export const onConnection = (socket) => {
     socket.emit('updateUser', user)
   })
 
+  socket.on('isOnline', async (userIds: number[]) => {
+    if (!socket.userId) {
+      socket.emit('error', "Not singed in");
+      return;
+    }
+
+    for (const id of userIds) {
+      if (clients[id]) clients[id].emit('isOnline', socket.userId);
+    }
+  })
+
   // socket.on('searchUserByNickname', (nickname: string) => {
   //     clients[Number(id)] = socket;
   // });
