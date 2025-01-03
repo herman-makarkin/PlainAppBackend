@@ -88,6 +88,17 @@ export const onConnection = (socket) => {
     socket.emit('updateUser', user)
   })
 
+  socket.on('isTyping', async (userIds: number[]) => {
+    if (!socket.userId) {
+      socket.emit('error', "Not singed in");
+      return;
+    }
+
+    for (const id of userIds) {
+      if (clients[id]) clients[id].emit('isTyping', socket.userId);
+    }
+  })
+
   socket.on('isOnline', async (userIds: number[]) => {
     if (!socket.userId) {
       socket.emit('error', "Not singed in");
