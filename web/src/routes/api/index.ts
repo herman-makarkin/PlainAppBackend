@@ -10,8 +10,9 @@ import { getChats, getUsers, getUserByPN, updateUser, createUser, getUser } from
 import { getChat, createChat, getAllChats, getNewChatMessages, markAsRead } from './chats/handlers'
 
 
-import { createChatMessage, chatInterlocutor } from './messages/handlers'
-import { getChatMessages } from "./chatMessages/handlers";
+import { createChatMessage, chatInterlocutor, deleteRemovedChatMessages } from './messages/handlers'
+import { getChatMessages, removeChatMessage } from "./chatMessages/handlers";
+import { chat } from "../../db/schema";
 
 export const apiRoutes = new Hono();
 apiRoutes.get("/", (c) => c.text("welcome to my api"));
@@ -115,6 +116,31 @@ export const onConnection = (socket) => {
   // });
 
   // Messages
+
+  socket.on('removeChatMessage', async (messageId: number) => {
+    if (!socket.userId) {
+      socket.emit('error', "Not singed in");
+      return;
+    }
+
+    removeChatMessage(messageId)
+    const interlocutor: number = await chatInterlocutor(chatId, socket.userId);
+    if (!interlocutor || !clients[interlocutor]) {
+      return;
+    }
+
+    clients[interlocutor].emit('removeChatMessage', message);
+  })
+
+  socket.on('deleteChatMessage', async (chatId) => {
+    if (!socket.userId) {
+      socket.emit('error', "Not singed in");
+      return;
+    }
+
+    deleteRemovedChatMessages(chatId, socket.userId);
+  })
+
 
   socket.on('getChatMessages', async (chatIds: number[]) => {
     if (!socket.userId) {

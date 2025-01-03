@@ -1,5 +1,5 @@
 import { drizzle } from "drizzle-orm/postgres-js";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, ne, or, sql } from "drizzle-orm";
 import messagesTable from "../../../db/schema/messages";
 import { HTTPException } from "hono/http-exception";
 import db from "../../../db";
@@ -56,19 +56,19 @@ export async function updateMessage(id: number, options: { body: string }) {
   }
 }
 
-export async function createChatMessage(id: number, options: { body: string, createdBy: number}) {
+export async function createChatMessage(id: number, options: { body: string, createdBy: number }) {
   try {
     const { body, createdBy } = options;
 
     const message = await db.insert(messagesTable).values({
-      body ,
+      body,
       createdBy,
     }).returning();
 
     console.log(message, "message~~~~~~~~~~!!!!!!!GAY");
     if (!message[0].id) throw new Error();
 
-    await db.insert(chatMessages).values({chatId: id, messageId: message[0].id})
+    await db.insert(chatMessages).values({ chatId: id, messageId: message[0].id })
 
     return message[0];
   } catch (e: unknown) {
@@ -78,7 +78,7 @@ export async function createChatMessage(id: number, options: { body: string, cre
 
 export async function chatInterlocutor(chatId: number, participantId: number) {
   try {
-    const chat = await db.select({participant1: chatsTable.participant1, participant2: chatsTable.participant2})
+    const chat = await db.select({ participant1: chatsTable.participant1, participant2: chatsTable.participant2 })
       .from(chatsTable).where(eq(chatsTable.id, chatId))
 
     let interlocutor;
@@ -95,18 +95,18 @@ export async function chatInterlocutor(chatId: number, participantId: number) {
   }
 }
 
-export async function createGroupMessage(groupId:number, options: { body: string, createdBy: number }) {
+export async function createGroupMessage(groupId: number, options: { body: string, createdBy: number }) {
   try {
     const { body, createdBy } = options;
 
     const message = await db.insert(messagesTable).values({
-      body ,
+      body,
       createdBy,
-    }).returning({id: messagesTable.id});
+    }).returning({ id: messagesTable.id });
 
     if (!message.id) throw new Error();
 
-    await db.insert(groupMessages).values({groupId: groupId, messageId: message.id})
+    await db.insert(groupMessages).values({ groupId: groupId, messageId: message.id })
 
     return message;
   } catch (e: unknown) {
@@ -124,3 +124,16 @@ export async function deleteMessage(options: { id: number }) {
     console.log(`Error deleting message: ${e}`);
   }
 }
+
+export async function deleteRemovedChatMessages(chatId: number, userId: number) {
+  try {
+    const result = await db.execute(sql`DELETE messages FROM chats
+                      JOIN chat_messages ON chat_messages.chat_id = chats.id 
+                      WHERE (messages.body LIKE "") AND messages.createdBy != ${userId}`);
+
+    return result;
+  } catch (e: unknown) {
+    console.log(`Error retrieving chat by id: ${e}`);
+  }
+}
+

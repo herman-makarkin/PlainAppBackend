@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { chatMessages } from "../../../db/schema/chats";
 import { HTTPException } from "hono/http-exception";
 import db from "../../../db";
@@ -27,6 +27,24 @@ export async function getChatMessages(chatId: number) {
   } catch (e: unknown) {
     console.log(`Error retrieving chats messages: ${e}`);
     return "suck";
+  }
+}
+
+export async function removeChatMessage(messageId: number) {
+  try {
+
+    return await db
+      .update(messagesTable)
+      .set({
+        body: "",
+        notifyDate: null,
+      })
+      .where(eq(messagesTable.id, messageId))
+      .returning({
+        id: messagesTable.id,
+      });
+  } catch (e: unknown) {
+    console.log(`Error updating message: ${e}`);
   }
 }
 
