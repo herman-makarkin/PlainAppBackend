@@ -298,7 +298,7 @@ export const onConnection = (socket) => {
 
     const interlocutor: number = await chatInterlocutor(chatId, socket.userId);
     if (interlocutor && clients[interlocutor]) {
-      clients[interlocutor].emit('offer', offer);
+      clients[interlocutor].emit('offer', offer, chatId);
     }
     // socket.to(roomId).emit('offer', offer);
 
@@ -314,7 +314,7 @@ export const onConnection = (socket) => {
 
     const interlocutor: number = await chatInterlocutor(chatId, socket.userId);
     if (interlocutor && clients[interlocutor]) {
-      clients[interlocutor].emit('answer', answer);
+      clients[interlocutor].emit('answer', answer, chatId);
     }
 
     // socket.to(roomId).emit('answer', answer);
@@ -331,7 +331,7 @@ export const onConnection = (socket) => {
 
     const interlocutor: number = await chatInterlocutor(chatId, socket.userId);
     if (interlocutor && clients[interlocutor]) {
-      clients[interlocutor].emit('ice candidate', candidate);
+      clients[interlocutor].emit('ice candidate', candidate, chatId);
     }
     // socket.to(roomId).emit('ice candidate', candidate);
 
