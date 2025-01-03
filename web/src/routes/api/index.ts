@@ -289,40 +289,51 @@ export const onConnection = (socket) => {
   });
 
 
-  socket.on('offer', (offer, roomId) => {
+  socket.on('offer', (offer, chatId: number) => {
 
     if (!socket.userId) {
       socket.emit('error', "Not singed in");
       return;
     }
 
-    socket.to(roomId).emit('offer', offer);
+    const interlocutor: number = await chatInterlocutor(chatId, socket.userId);
+    if (interlocutor && clients[interlocutor]) {
+      clients[interlocutor].emit('offer', offer);
+    }
+    // socket.to(roomId).emit('offer', offer);
 
   });
 
 
-  socket.on('answer', (answer, roomId) => {
+  socket.on('answer', (answer, chatId: number) => {
 
     if (!socket.userId) {
       socket.emit('error', "Not singed in");
       return;
     }
 
+    const interlocutor: number = await chatInterlocutor(chatId, socket.userId);
+    if (interlocutor && clients[interlocutor]) {
+      clients[interlocutor].emit('answer', answer);
+    }
 
-    socket.to(roomId).emit('answer', answer);
+    // socket.to(roomId).emit('answer', answer);
 
   });
 
 
-  socket.on('ice candidate', (candidate, roomId) => {
+  socket.on('ice candidate', (candidate, chatId: number) => {
 
     if (!socket.userId) {
       socket.emit('error', "Not singed in");
       return;
     }
 
-
-    socket.to(roomId).emit('ice candidate', candidate);
+    const interlocutor: number = await chatInterlocutor(chatId, socket.userId);
+    if (interlocutor && clients[interlocutor]) {
+      clients[interlocutor].emit('ice candidate', candidate);
+    }
+    // socket.to(roomId).emit('ice candidate', candidate);
 
   });
 }
