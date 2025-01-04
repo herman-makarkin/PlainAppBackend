@@ -274,7 +274,7 @@ export const onConnection = (socket) => {
 
   // webrtc
 
-  socket.on('join room', (roomId: string) => {
+  socket.on('join room', async (roomId: string) => {
 
     if (!socket.userId) {
       socket.emit('error', "Not singed in");
@@ -289,7 +289,7 @@ export const onConnection = (socket) => {
   });
 
 
-  socket.on('offer', (offer, chatId: number) => {
+  socket.on('offer', async (offer, chatId: number) => {
 
     if (!socket.userId) {
       socket.emit('error', "Not singed in");
@@ -305,7 +305,7 @@ export const onConnection = (socket) => {
   });
 
 
-  socket.on('answer', (answer, chatId: number) => {
+  socket.on('answer', async (answer, chatId: number) => {
 
     if (!socket.userId) {
       socket.emit('error', "Not singed in");
@@ -322,7 +322,7 @@ export const onConnection = (socket) => {
   });
 
 
-  socket.on('ice candidate', (candidate, chatId: number) => {
+  socket.on('ice candidate', async (candidate, chatId: number) => {
 
     if (!socket.userId) {
       socket.emit('error', "Not singed in");
