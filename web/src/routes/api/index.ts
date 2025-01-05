@@ -100,14 +100,44 @@ export const onConnection = (socket) => {
     }
   })
 
-  socket.on('isOnline', async (userIds: number[]) => {
+  socket.on('isNotTyping', async (userIds: number[]) => {
     if (!socket.userId) {
       socket.emit('error', "Not singed in");
       return;
     }
 
     for (const id of userIds) {
-      if (clients[id]) clients[id].emit('isOnline', socket.userId);
+      if (clients[id]) clients[id].emit('isNotTyping', socket.userId);
+    }
+  })
+
+  socket.on('isOnline', async (userIds: number[]) => {
+    if (!socket.userId) {
+      socket.emit('error', "Not singed in");
+      return;
+    }
+
+    if (userIds) {
+      socket.contacts = userIds;
+
+      for (const id of userIds) {
+        if (clients[id]) clients[id].emit('isOnline', socket.userId);
+      }
+    }
+  })
+
+  socket.on('isOffline', async (userIds: number[]) => {
+    if (!socket.userId) {
+      socket.emit('error', "Not singed in");
+      return;
+    }
+
+    if (userIds) {
+      socket.contacts = userIds;
+
+      for (const id of userIds) {
+        if (clients[id]) clients[id].emit('isOffline', socket.userId);
+      }
     }
   })
 
@@ -290,6 +320,7 @@ export const onConnection = (socket) => {
 
 
   socket.on('offer', async (offer, chatId: number) => {
+    chatId = Number(chatId);
 
     if (!socket.userId) {
       socket.emit('error', "Not singed in");
@@ -306,6 +337,7 @@ export const onConnection = (socket) => {
 
 
   socket.on('answer', async (answer, chatId: number) => {
+    chatId = Number(chatId);
 
     if (!socket.userId) {
       socket.emit('error', "Not singed in");
@@ -323,6 +355,7 @@ export const onConnection = (socket) => {
 
 
   socket.on('ice candidate', async (candidate, chatId: number) => {
+    chatId = Number(chatId);
 
     if (!socket.userId) {
       socket.emit('error', "Not singed in");
