@@ -297,6 +297,11 @@ export const onConnection = (socket) => {
 
   socket.on('disconnect', () => {
     if (socket.userId && clients[socket.userId]) {
+      if (socket.contacts) {
+        for (const id of socket.contacts) {
+          if (clients[id]) clients[id].emit('isOffline', socket.userId);
+        }
+      }
       delete clients[socket.userId];
     }
     console.log('User disconnected');
