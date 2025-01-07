@@ -323,6 +323,21 @@ export const onConnection = (socket) => {
 
   });
 
+  socket.on('state', async (state: number, chatId: number) => {
+    chatId = Number(chatId);
+
+    if (!socket.userId) {
+      socket.emit('error', "Not singed in");
+      return;
+    }
+
+    const interlocutor: number = await chatInterlocutor(chatId, socket.userId);
+    if (interlocutor && clients[interlocutor]) {
+      clients[interlocutor].emit('state', state, chatId);
+    }
+  });
+
+
 
   socket.on('offer', async (offer, chatId: number) => {
     chatId = Number(chatId);
