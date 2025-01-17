@@ -111,6 +111,21 @@ export const onConnection = (socket) => {
     }
   })
 
+  socket.on('isOnline?', async (userIds: number[]) => {
+    if (!socket.userId) {
+      socket.emit('error', "Not singed in");
+      return;
+    }
+
+    if (userIds) {
+      socket.contacts = userIds;
+
+      for (const id of userIds) {
+        if (clients[id]) clients[id].emit('isOnline', socket.userId);
+      }
+    }
+  })
+
   socket.on('isOnline', async (userIds: number[]) => {
     if (!socket.userId) {
       socket.emit('error', "Not singed in");
