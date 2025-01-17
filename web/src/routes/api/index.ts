@@ -121,7 +121,7 @@ export const onConnection = (socket) => {
       socket.contacts = userIds;
 
       for (const id of userIds) {
-        if (clients[id]) clients[id].emit('isOnline', socket.userId);
+        if (clients[id]) clients[id].emit('isOnline?', socket.userId);
       }
     }
   })
