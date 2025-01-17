@@ -7,9 +7,9 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
     expose:
-      - "5432"
+      - "5430"
     ports:
-      - 5432:${DB_PORT}
+      - 5430:${DB_PORT}
     restart: always
 
     volumes:
@@ -57,7 +57,7 @@ services:
       # - pgadmin
     image: nginx:latest
     ports:
-      - "321:80"
+      - "321:4000"
     volumes:
       - ./nginx:/etc/nginx/conf.d
       - ./static:/var/www/static
