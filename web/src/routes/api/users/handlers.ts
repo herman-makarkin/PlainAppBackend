@@ -134,6 +134,7 @@ export async function updateLastConnected(id: number) {
 export async function newlyUpdated(userIds: number[], id: number) {
   const lastConnected = await db.select({ lastConnected: usersTable.lastConnected }).from(usersTable).where(eq(usersTable.id, id));
   const newlyUpdatedUsers = await db.select({
+    id: usersTable.id,
     name: usersTable.name,
     bio: usersTable.bio,
     phoneNumber: usersTable.phoneNumber,
