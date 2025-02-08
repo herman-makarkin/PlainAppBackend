@@ -12,7 +12,7 @@ import group from "./groups";
 
 const user = pgTable("users", {
   id: serial("id").primaryKey(),
-  nickname: varchar({ length: 60 }).unique().notNull(),
+  nickname: varchar({ length: 60 }).notNull().unique(),
   name: varchar({ length: 60 }).notNull(),
   bio: varchar({ length: 80 }),
   birthdate: date("birthdate"),
