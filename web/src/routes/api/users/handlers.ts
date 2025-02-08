@@ -133,7 +133,13 @@ export async function updateLastConnected(id: number) {
 
 export async function newlyUpdated(userIds: number[], id: number) {
   const lastConnected = await db.select({ lastConnected: usersTable.lastConnected }).from(usersTable).where(eq(usersTable.id, id));
-  const newlyUpdatedUsers = await db.select().from(usersTable).where(and(not(eq(usersTable.id, id))), gte(usersTable.updatedAt, lastConnected[0]));
+  const newlyUpdatedUsers = await db.select({
+    name: usersTable.name,
+    bio: usersTable.bio,
+    phoneNumber: usersTable.phoneNumber,
+    nickname: usersTable.nickname,
+    birthdate: usersTable.birthdate
+  }).from(usersTable).where(and(not(eq(usersTable.id, id))), gte(usersTable.updatedAt, lastConnected[0]));
   return newlyUpdatedUsers;
 }
 
