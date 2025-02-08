@@ -6,13 +6,14 @@ import messageRoutes from "./messages";
 import chatMessagesRoutes from "./chatMessages";
 import groupRoutes from "./groups";
 import { test } from "./test";
-import { getChats, getUsers, getUserByPN, updateUser, createUser, getUser } from './users/handlers'
+import { getChats, getUsers, getUserByPN, updateUser, createUser, getUser, updateLastConnected, newlyUpdated } from './users/handlers'
 import { getChat, createChat, getAllChats, getNewChatMessages, markAsRead } from './chats/handlers'
 
 
 import { createChatMessage, chatInterlocutor, deleteRemovedChatMessages } from './messages/handlers'
 import { getChatMessages, removeChatMessage } from "./chatMessages/handlers";
 import { chat } from "../../db/schema";
+import { sql } from "drizzle-orm";
 
 export const apiRoutes = new Hono();
 apiRoutes.get("/", (c) => c.text("welcome to my api"));
@@ -64,7 +65,7 @@ export const onConnection = (socket) => {
       clients[Number(User.id)] = socket;
       socket.emit('createUser', User.id);
     } catch (err) {
-      socket.emit('signupError', err);
+      socket.emit('signupError', err.message);
     }
     // console.log(User);
     // if (!User) {
@@ -84,7 +85,7 @@ export const onConnection = (socket) => {
     socket.emit('userByPN', user);
   })
 
-  socket.on('updateUser', async (data: any) => {
+  socket.on('updateUser', async (data: any, userIds: number[]) => {
     let user = await updateUser(socket.userId, data);
     if (user instanceof Error) {
       socket.emit('updateUserError', user.message);
@@ -93,6 +94,12 @@ export const onConnection = (socket) => {
     user = user[0];
     console.log('User updated:', user.id);
     socket.emit('updateUser', user.id);
+    if (userIds) {
+      socket.contacts = userIds;
+      for (const id of userIds) {
+        if (clients[id]) clients[id].emit('updateContact', socket.userId, data);
+      }
+    }
   })
 
   socket.on('isTyping', async (userIds: number[]) => {
@@ -145,6 +152,21 @@ export const onConnection = (socket) => {
         if (clients[id]) clients[id].emit('isOnline', socket.userId);
       }
     }
+  })
+
+  socket.on('updatedContacts', async (userIds: number[]) => {
+    console.log('gay');
+    if (!socket.userId) {
+      socket.emit('error', "Not singed in");
+      return;
+    }
+    console.log('gay2');
+
+    let result = await newlyUpdated(userIds, socket.userId)
+
+    console.log('gay3');
+    socket.emit('updatedContacts', result)
+
   })
 
   socket.on('isOffline', async (userIds: number[]) => {
@@ -316,7 +338,7 @@ export const onConnection = (socket) => {
   })
   // Chats End
 
-  socket.on('disconnect', () => {
+  socket.on('disconnect', async () => {
     if (socket.userId && clients[socket.userId]) {
       if (socket.contacts) {
         for (const id of socket.contacts) {
@@ -324,6 +346,8 @@ export const onConnection = (socket) => {
         }
       }
       delete clients[socket.userId];
+      console.log(await updateLastConnected(socket.userId));
+      console.log('very gay');
     }
     console.log('User disconnected');
   });

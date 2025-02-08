@@ -1,4 +1,4 @@
-import { aliasedTable, eq, or, sql } from "drizzle-orm";
+import { aliasedTable, eq, gte, not, or, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../../db";
 import usersTable from "../../../db/schema/users";
@@ -125,6 +125,16 @@ export async function updateUser(
     console.log(`Error updating user: ${e}`);
     return e;
   }
+}
+
+export async function updateLastConnected(id: number) {
+  return await db.update(usersTable).set({ lastConnected: sql`NOW()` }).where(eq(usersTable.id, id));
+}
+
+export async function newlyUpdated(userIds: number[], id: number) {
+  const lastConnected = await db.select({ lastConnected: usersTable.lastConnected }).from(usersTable).where(eq(usersTable.id, id));
+  const newlyUpdatedUsers = await db.select().from(usersTable).where(and(not(eq(usersTable.id, id))), gte(usersTable.updatedAt, lastConnected[0]));
+  return newlyUpdatedUsers;
 }
 
 export async function createUser(options: {

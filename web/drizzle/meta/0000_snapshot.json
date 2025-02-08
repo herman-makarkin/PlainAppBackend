@@ -1,5 +1,5 @@
 {
-  "id": "ed82ff3d-e102-460c-8f7d-62c5ecdbd883",
+  "id": "002b9e83-c29c-4ea1-86ca-3ca1cd06b6e2",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -333,13 +333,13 @@
           "name": "nickname",
           "type": "varchar(60)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "name": {
           "name": "name",
           "type": "varchar(60)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "bio": {
           "name": "bio",
@@ -358,6 +358,13 @@
           "type": "varchar(15)",
           "primaryKey": false,
           "notNull": true
+        },
+        "last_connected": {
+          "name": "last_connected",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
         },
         "created_at": {
           "name": "created_at",
@@ -378,6 +385,13 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
+        "users_nickname_unique": {
+          "name": "users_nickname_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "nickname"
+          ]
+        },
         "users_phone_number_unique": {
           "name": "users_phone_number_unique",
           "nullsNotDistinct": false,
