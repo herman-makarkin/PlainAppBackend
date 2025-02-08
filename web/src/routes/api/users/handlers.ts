@@ -140,16 +140,18 @@ export async function newlyUpdated(userIds: number[], id: number) {
 export async function createUser(options: {
   phoneNumber: string;
   name?: string;
+  nickname?: string
   bio?: string;
   birthdate?: string;
 }) {
   try {
-    const { phoneNumber, name, bio, birthdate } = options;
+    const { phoneNumber, nickname, name, bio, birthdate } = options;
 
     const user = await db.insert(usersTable).values({
-      name: name,
       bio: bio,
+      name: name,
       phoneNumber: phoneNumber,
+      nickname: nickname,
       birthdate: birthdate,
       createdAt: sql`NOW()`,
       updatedAt: sql`NOW()`,
