@@ -98,15 +98,16 @@ export async function getUser(id: number) {
 
 export async function updateUser(
   id: number,
-  options: { phoneNumber?: string; name?: string; bio?: string, birthdate?: string },
+  options: { phoneNumber?: string; name?: string; bio?: string, birthdate?: string, nickname?: string },
 ) {
   try {
-    const { phoneNumber, name, bio, birthdate } = options;
+    const { phoneNumber, name, bio, birthdate, nickname } = options;
 
     return await db
       .update(usersTable)
       .set({
         ...(name ? { name } : {}),
+        ...(nickname ? { nickname } : {}),
         ...(bio ? { bio } : {}),
         ...(birthdate ? { birthdate } : {}),
         ...(phoneNumber ? { phoneNumber } : {}),
@@ -122,6 +123,7 @@ export async function updateUser(
       });
   } catch (e: unknown) {
     console.log(`Error updating user: ${e}`);
+    return e;
   }
 }
 

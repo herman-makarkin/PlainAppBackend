@@ -50,22 +50,27 @@ export const onConnection = (socket) => {
     clients[Number(id)] = socket;
     socket.emit('signin', 'OK');
   });
+
   socket.on('createUser', async (user) => {
-    let User = await createUser(user);
-    console.log(User);
-    if (!User) {
-      socket.emit('error', "Incorrect data");
-      return;
+    try {
+      let User = await createUser(user);
+      User = User[0];
+      console.log('User registered:', User.id);
+      if (socket.userId && clients[socket.userId]) {
+        delete clients[socket.userId];
+      }
+      socket.userId = User.id;
+      console.log(socket.userId)
+      clients[Number(User.id)] = socket;
+      socket.emit('createUser', User.id);
+    } catch (err) {
+      socket.emit('signupError', err);
     }
-    User = User[0];
-    console.log('User registered:', User.id);
-    if (socket.userId && clients[socket.userId]) {
-      delete clients[socket.userId];
-    }
-    socket.userId = User.id;
-    console.log(socket.userId)
-    clients[Number(User.id)] = socket;
-    socket.emit('createUser', User);
+    // console.log(User);
+    // if (!User) {
+    //   socket.emit('error', "Incorrect data");
+    //   return;
+    // }
   });
 
   socket.on('userByPN', async (PN: string) => {
@@ -79,14 +84,15 @@ export const onConnection = (socket) => {
     socket.emit('userByPN', user);
   })
 
-  socket.on('updateUser', async (data) => {
-    const user = await updateUser(socket.userId, data);
-    if (!user) {
-      socket.emit('error', "Incorrect data");
+  socket.on('updateUser', async (data: any) => {
+    let user = await updateUser(socket.userId, data);
+    if (user instanceof Error) {
+      socket.emit('updateUserError', user);
       return;
     }
+    user = user[0];
     console.log('User updated:', user.id);
-    socket.emit('updateUser', user)
+    socket.emit('updateUser', user.id);
   })
 
   socket.on('isTyping', async (userIds: number[]) => {
