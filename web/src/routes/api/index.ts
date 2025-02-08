@@ -77,7 +77,7 @@ export const onConnection = (socket) => {
     let user = await getUserByPN(PN);
     console.log('phone number !!#@$%@#', PN);
     if (!user) {
-      socket.emit('error', "User not found");
+      socket.emit('userBuPN', { "error": "User not found" });
       return;
     }
     user = user[0];
