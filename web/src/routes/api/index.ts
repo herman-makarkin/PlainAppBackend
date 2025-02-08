@@ -87,7 +87,7 @@ export const onConnection = (socket) => {
   socket.on('updateUser', async (data: any) => {
     let user = await updateUser(socket.userId, data);
     if (user instanceof Error) {
-      socket.emit('updateUserError', user);
+      socket.emit('updateUserError', user.message);
       return;
     }
     user = user[0];
