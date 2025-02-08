@@ -31,18 +31,21 @@ async function test() {
 
   let user1 = {
     name: "Vladimir",
+    nickname: "Vladimir228",
     bio: "im very happy to be alive",
     phoneNumber: "88005553535",
   };
 
   let user2 = {
     name: "Pedro",
+    nickname: "Pedro228",
     bio: "im very happy to be alive",
     phoneNumber: "88005553536",
   };
 
   let user3 = {
     name: "Pablo",
+    nickname: "Pablo228",
     bio: "im very happy to be alive",
     phoneNumber: "88005553537",
   };
