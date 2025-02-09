@@ -336,7 +336,7 @@ export const onConnection = (socket) => {
     if (!chat) return;
     socket.emit('createChat', chat[0].id)
     if (!clients[participant1]) return;
-    clients[participant1].emit('createChat', chat);
+    clients[participant1].emit('createChat', chat[0]);
   })
 
   // Chats End
