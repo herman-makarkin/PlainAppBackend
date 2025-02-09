@@ -90,7 +90,15 @@ export async function getChats(id: number) {
 export async function getUser(id: number) {
   try {
     const user = await db
-      .select()
+      .select({
+        id: usersTable.id,
+        name: usersTable.name,
+        bio: usersTable.bio,
+        phoneNumber: usersTable.phoneNumber,
+        nickname: usersTable.nickname,
+        birthdate: usersTable.birthdate,
+        createdAt: usersTable.createdAt,
+      })
       .from(usersTable)
       .where(eq(usersTable.id, id));
 
