@@ -155,7 +155,9 @@ export async function newlyUpdated(userIds: number[], id: number) {
 
 export async function searchUsers(nickname: string) {
   const users = await db.select({
-    id: usersTable.id, nickname: usersTable.nickname,
+    id: usersTable.id,
+    nickname: usersTable.nickname,
+    birthdate: usersTable.birthdate,
     name: usersTable.name,
     bio: usersTable.bio,
     phoneNumber: usersTable.phoneNumber,
