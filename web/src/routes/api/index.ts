@@ -76,7 +76,7 @@ export const onConnection = (socket) => {
 
   socket.on('userByPN', async (PN: string) => {
     let user = await getUserByPN(PN);
-    console.log('phone number !!#@$%@#', PN);
+    console.log('phone number PN);
     if (!user) {
       socket.emit('userBuPN', { "error": "User not found" });
       return;
@@ -159,16 +159,13 @@ export const onConnection = (socket) => {
   })
 
   socket.on('updatedContacts', async (userIds: number[]) => {
-    console.log('gay');
     if (!socket.userId) {
       socket.emit('error', "Not singed in");
       return;
     }
-    console.log('gay2');
 
     let result = await newlyUpdated(userIds, socket.userId)
 
-    console.log('gay3');
     socket.emit('updatedContacts', result)
   })
 
@@ -237,8 +234,7 @@ export const onConnection = (socket) => {
 
 
   socket.on('chatMessage', async (chatId: number, msg: Message) => {
-    console.log(msg);
-    console.log("socket!!!", socket.userId);
+    console.log("socket ", socket.userId);
     if (!socket.userId) {
       socket.emit('error', "Not singed in");
       return;
@@ -263,7 +259,7 @@ export const onConnection = (socket) => {
   socket.on('newChatMessages', async (chatIds: number[]) => {
     // const chatIds = options.chatIds;
     console.log(chatIds, 'chatIds');
-    console.log("socket!!!", socket.userId);
+    console.log("socket ", socket.userId);
     if (!socket.userId) {
       socket.emit('error', "Not singed in");
       return;
@@ -334,7 +330,7 @@ export const onConnection = (socket) => {
     console.log(socket.userId, 'socket', participant1, 'participant1');
     const chat = await createChat({ participant1, participant2: socket.userId });
     if (!chat) return;
-    socket.emit('createChat', chat[0].id)
+    socket.emit('createChat', chat[0])
     if (!clients[participant1]) return;
     clients[participant1].emit('createChat', chat[0]);
   })
@@ -350,7 +346,6 @@ export const onConnection = (socket) => {
       }
       delete clients[socket.userId];
       console.log(await updateLastConnected(socket.userId));
-      console.log('very gay');
     }
     console.log('User disconnected');
   });

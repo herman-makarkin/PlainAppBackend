@@ -14,7 +14,7 @@ export async function getUserChats(userId: number) {
     return result;
   } catch (e: unknown) {
     console.log(`Error retrieving user chats: ${e}`);
-    return "suck";
+    return;
   }
 }
 
@@ -49,7 +49,7 @@ export async function getUserChat(userId: number, chatId: number) {
     return result;
   } catch (e: unknown) {
     console.log(`Error retrieving user chats: ${e}`);
-    return "suck";
+    return;
   }
 }
 

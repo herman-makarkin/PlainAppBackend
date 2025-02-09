@@ -13,7 +13,7 @@ export async function getAllChats() {
     return result;
   } catch (e: unknown) {
     console.log(`Error retrieving chats: ${e}`);
-    return "suck";
+    return;
   }
 }
 

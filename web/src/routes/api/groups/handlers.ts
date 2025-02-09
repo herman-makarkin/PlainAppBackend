@@ -11,7 +11,7 @@ export async function getGroups() {
     return result;
   } catch (e: unknown) {
     console.log(`Error retrieving groups: ${e}`);
-    return "suck";
+    return;
   }
 }
 
@@ -60,15 +60,15 @@ export async function updateGroup(
       });
   } catch (e: unknown) {
     console.log(`Error updating group: ${e}`);
-    return {message: 'error'};
+    return { message: 'error' };
   }
 }
 
-export async function createGroup(options: {name: string, description: string, metadata: string}) {
+export async function createGroup(options: { name: string, description: string, metadata: string }) {
   try {
     const { name, description, metadata } = options;
 
-      return await db.insert(groupsTable).values({name, description, metadata}).returning({id: groupsTable.id})
+    return await db.insert(groupsTable).values({ name, description, metadata }).returning({ id: groupsTable.id })
   } catch (e: unknown) {
     console.log(`Error creating group: ${e}`);
   }
@@ -85,7 +85,7 @@ export async function deleteGroup(options: { id: number }) {
 
 export async function addUser(userId: number, groupId: number) {
   try {
-    return await db.insert(userGroups).values({groupId, userId})
+    return await db.insert(userGroups).values({ groupId, userId })
   } catch (e: unknown) {
     console.log(`Error adding user to group: ${e}`);
   }

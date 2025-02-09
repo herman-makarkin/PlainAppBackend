@@ -14,13 +14,12 @@ export async function getUsers() {
     return result;
   } catch (e: unknown) {
     console.log(`Error retrieving users: ${e}`);
-    return "suck";
+    return;
   }
 }
 
 export async function getUserByPN(phoneNumber: string) {
   try {
-    console.log(phoneNumber)
     const result = await db.select({
       id: usersTable.id,
       birthdate: usersTable.birthdate,
@@ -31,12 +30,10 @@ export async function getUserByPN(phoneNumber: string) {
       createdAt: usersTable.createdAt
     }).from(usersTable)
       .where(eq(usersTable.phoneNumber, phoneNumber));
-    console.log(await db.select().from(usersTable).where(eq(usersTable.phoneNumber, "88005553535")))
-    console.log(result);
     return result;
   } catch (e: unknown) {
     console.log(`Error retrieving user by phone number${e}`);
-    return "suck";
+    return;
   }
 }
 
@@ -68,7 +65,7 @@ export async function getChatMessages(id1: number, id2: number) {
     return result;
   } catch (e: unknown) {
     console.log(`Error retrieving chat messages: ${e}`);
-    return "suck";
+    return;
   }
 }
 
@@ -83,7 +80,7 @@ export async function getChats(id: number) {
     return result;
   } catch (e: unknown) {
     console.log(`Error retrieving chats: ${e}`);
-    return "suck";
+    return;
   }
 }
 

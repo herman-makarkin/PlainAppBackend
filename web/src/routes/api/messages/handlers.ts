@@ -14,7 +14,7 @@ export async function getMessages() {
     return result;
   } catch (e: unknown) {
     console.log(`Error retrieving messages: ${e}`);
-    return "suck";
+    return;
   }
 }
 
