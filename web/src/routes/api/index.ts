@@ -76,7 +76,7 @@ export const onConnection = (socket) => {
 
   socket.on('userByPN', async (PN: string) => {
     let user = await getUserByPN(PN);
-    console.log('phone number PN);
+    console.log('phone number PN');
     if (!user) {
       socket.emit('userBuPN', { "error": "User not found" });
       return;
