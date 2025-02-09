@@ -6,7 +6,7 @@ import messageRoutes from "./messages";
 import chatMessagesRoutes from "./chatMessages";
 import groupRoutes from "./groups";
 import { test } from "./test";
-import { getChats, getUsers, getUserByPN, updateUser, createUser, getUser, updateLastConnected, newlyUpdated } from './users/handlers'
+import { getChats, getUsers, getUserByPN, updateUser, createUser, getUser, updateLastConnected, newlyUpdated, searchUsers } from './users/handlers'
 import { getChat, createChat, getAllChats, getNewChatMessages, markAsRead } from './chats/handlers'
 
 
@@ -102,6 +102,10 @@ export const onConnection = (socket) => {
     }
   })
 
+  socket.on('userSearch', async (nickname) => {
+    socket.emit('userSearch', await searchUsers(nickname));
+  })
+
   socket.on('isTyping', async (userIds: number[]) => {
     if (!socket.userId) {
       socket.emit('error', "Not singed in");
@@ -166,7 +170,6 @@ export const onConnection = (socket) => {
 
     console.log('gay3');
     socket.emit('updatedContacts', result)
-
   })
 
   socket.on('isOffline', async (userIds: number[]) => {
@@ -331,11 +334,11 @@ export const onConnection = (socket) => {
     console.log(socket.userId, 'socket', participant1, 'participant1');
     const chat = await createChat({ participant1, participant2: socket.userId });
     if (!chat) return;
-    socket.emit('createChat', chat)
+    socket.emit('createChat', chat[0].id)
     if (!clients[participant1]) return;
     clients[participant1].emit('createChat', chat);
-
   })
+
   // Chats End
 
   socket.on('disconnect', async () => {

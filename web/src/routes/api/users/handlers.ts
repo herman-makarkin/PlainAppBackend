@@ -1,4 +1,4 @@
-import { aliasedTable, eq, gte, not, or, sql } from "drizzle-orm";
+import { aliasedTable, eq, gte, like, not, or, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../../db";
 import usersTable from "../../../db/schema/users";
@@ -21,7 +21,16 @@ export async function getUsers() {
 export async function getUserByPN(phoneNumber: string) {
   try {
     console.log(phoneNumber)
-    const result = await db.select().from(usersTable).where(eq(usersTable.phoneNumber, phoneNumber));
+    const result = await db.select({
+      id: usersTable.id,
+      birthdate: usersTable.birthdate,
+      name: usersTable.name,
+      nickname: usersTable.nickname,
+      bio: usersTable.bio,
+      updatedAt: usersTable.updatedAt,
+      createdAt: usersTable.createdAt
+    }).from(usersTable)
+      .where(eq(usersTable.phoneNumber, phoneNumber));
     console.log(await db.select().from(usersTable).where(eq(usersTable.phoneNumber, "88005553535")))
     console.log(result);
     return result;
@@ -142,6 +151,18 @@ export async function newlyUpdated(userIds: number[], id: number) {
     birthdate: usersTable.birthdate
   }).from(usersTable).where(and(not(eq(usersTable.id, id))), gte(usersTable.updatedAt, lastConnected[0]));
   return newlyUpdatedUsers;
+}
+
+export async function searchUsers(nickname: string) {
+  const users = await db.select({
+    id: usersTable.id, nickname: usersTable.nickname,
+    name: usersTable.name,
+    bio: usersTable.bio,
+    phoneNumber: usersTable.phoneNumber,
+    createdAt: usersTable.createdAt
+  }).from(usersTable)
+    .where(like(usersTable.nickname, `%${nickname}%`)).limit(10);
+  return users;
 }
 
 export async function createUser(options: {
