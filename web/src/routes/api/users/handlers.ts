@@ -1,4 +1,4 @@
-import { aliasedTable, eq, gte, like, not, or, sql } from "drizzle-orm";
+import { eq, gte, ilike, not, or, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../../db";
 import usersTable from "../../../db/schema/users";
@@ -163,7 +163,7 @@ export async function searchUsers(nickname: string) {
     phoneNumber: usersTable.phoneNumber,
     createdAt: usersTable.createdAt
   }).from(usersTable)
-    .where(like(usersTable.nickname, `%${nickname}%`)).limit(10);
+    .where(ilike(usersTable.nickname, `%${nickname}%`)).limit(10);
   return users;
 }
 
